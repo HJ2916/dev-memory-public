@@ -1,0 +1,19 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# TRAE
+.trae-cache/
+
+# Temporary
+*.tmp
+*.bak
+*.log
