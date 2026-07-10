@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>dev-memory — AI 编程项目开发记忆持久化技能</title>
+<title>dev-memory — 项目级 AI 记忆系统</title>
 <style>
-/* ========== Reset & Base ========== */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
@@ -28,9 +27,11 @@
   --accent-amber: #fbbf24;
   --accent-rose: #fb7185;
   --accent-violet: #a78bfa;
+  --accent-orange: #fb923c;
   --gradient-hero: linear-gradient(135deg, #0a0e1a 0%, #111936 40%, #0a1828 70%, #0a0e1a 100%);
   --gradient-indigo-cyan: linear-gradient(135deg, #6366f1 0%, #22d3ee 100%);
   --gradient-green-cyan: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+  --gradient-amber-rose: linear-gradient(135deg, #fbbf24 0%, #fb7185 100%);
   --shadow-card: 0 4px 24px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.3);
   --shadow-glow-indigo: 0 0 30px rgba(99,102,241,0.15);
   --shadow-glow-cyan: 0 0 30px rgba(34,211,238,0.12);
@@ -45,1375 +46,855 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Source Han Sans CN", "Noto Sans CJK SC", sans-serif;
   background: var(--bg-base);
   color: var(--text-primary);
-  line-height: 1.75;
+  line-height: 1.8;
   font-size: 15px;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
 }
 
-code, pre, .mono {
-  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", "SF Mono", "Consolas", "Source Code Pro", monospace;
-}
+code, pre { font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", "Consolas", monospace; }
 
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
+.container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
 
-/* ========== Hero Section ========== */
+/* ========== Hero ========== */
 .hero {
-  position: relative;
   background: var(--gradient-hero);
-  padding: 80px 24px 70px;
+  padding: 80px 0 64px;
   text-align: center;
+  position: relative;
   overflow: hidden;
-  border-bottom: 1px solid var(--border);
 }
-
 .hero::before {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-image:
-    radial-gradient(circle at 20% 30%, rgba(99,102,241,0.12) 0%, transparent 50%),
-    radial-gradient(circle at 80% 70%, rgba(34,211,238,0.10) 0%, transparent 50%);
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(ellipse at 30% 40%, rgba(99,102,241,0.08) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 60%, rgba(34,211,238,0.06) 0%, transparent 50%);
   pointer-events: none;
 }
-
-.hero::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-image:
-    linear-gradient(rgba(99,102,241,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(99,102,241,0.04) 1px, transparent 1px);
-  background-size: 50px 50px;
-  pointer-events: none;
-  mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
-  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
-}
-
-.hero-content {
-  position: relative;
-  z-index: 1;
-  max-width: 760px;
-  margin: 0 auto;
-}
-
 .hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 18px;
+  display: inline-block;
+  padding: 6px 16px;
   background: rgba(99,102,241,0.12);
   border: 1px solid rgba(99,102,241,0.3);
-  border-radius: 100px;
+  border-radius: 20px;
   font-size: 13px;
   color: var(--accent-indigo-bright);
-  font-weight: 500;
   margin-bottom: 28px;
-  letter-spacing: 0.5px;
+  position: relative;
 }
-
-.hero-badge .dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: var(--accent-green);
-  box-shadow: 0 0 8px var(--accent-green);
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-
 .hero h1 {
   font-size: 52px;
   font-weight: 800;
-  letter-spacing: -1.5px;
-  margin-bottom: 12px;
-  background: linear-gradient(135deg, #e8ecf4 0%, #818cf8 50%, #22d3ee 100%);
+  letter-spacing: -0.02em;
+  background: var(--gradient-indigo-cyan);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
+  margin-bottom: 16px;
+  position: relative;
 }
-
-.hero .hero-mono {
-  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
-}
-
 .hero-tagline {
-  font-size: 18px;
+  font-size: 20px;
   color: var(--text-secondary);
-  line-height: 1.7;
-  margin-bottom: 32px;
-  font-weight: 400;
+  max-width: 640px;
+  margin: 0 auto 36px;
+  position: relative;
+  line-height: 1.6;
 }
-
-.hero-tagline strong {
-  color: var(--accent-cyan);
-  font-weight: 600;
-}
-
 .hero-stats {
   display: flex;
   justify-content: center;
   gap: 48px;
   flex-wrap: wrap;
-  margin-top: 8px;
+  position: relative;
 }
-
-.hero-stat {
-  text-align: center;
-}
-
-.hero-stat .num {
+.hero-stat { text-align: center; }
+.hero-stat-num {
   font-size: 28px;
   font-weight: 700;
-  color: var(--accent-green);
-  font-family: "JetBrains Mono", monospace;
+  color: var(--accent-cyan);
 }
-
-.hero-stat .label {
-  font-size: 12px;
+.hero-stat-label {
+  font-size: 13px;
   color: var(--text-muted);
-  margin-top: 2px;
-  letter-spacing: 0.5px;
+  margin-top: 4px;
 }
 
 /* ========== Section ========== */
-.section {
-  padding: 64px 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.section-header {
-  margin-bottom: 40px;
-}
-
-.section-eyebrow {
-  display: inline-block;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--accent-cyan);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 10px;
-  font-family: "JetBrains Mono", monospace;
-}
-
+.section { padding: 64px 0; }
 .section-title {
-  font-size: 30px;
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.5px;
-  margin-bottom: 10px;
-}
-
-.section-subtitle {
-  font-size: 15px;
-  color: var(--text-muted);
-  max-width: 640px;
-}
-
-/* ========== Problem / Motivation / Product ========== */
-.intro-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-
-.intro-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 28px;
-  box-shadow: var(--shadow-card);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.intro-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 3px;
-  background: var(--gradient-indigo-cyan);
-  opacity: 0.7;
-}
-
-.intro-card:hover {
-  border-color: var(--border-light);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-}
-
-.intro-card .icon-wrap {
-  width: 44px; height: 44px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 18px;
-}
-
-.intro-card .icon-wrap.indigo { background: rgba(99,102,241,0.15); }
-.intro-card .icon-wrap.cyan { background: rgba(34,211,238,0.15); }
-.intro-card .icon-wrap.green { background: rgba(52,211,153,0.15); }
-
-.intro-card h3 {
-  font-size: 17px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  color: var(--text-primary);
-}
-
-.intro-card p {
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.75;
-}
-
-.intro-card .tag {
-  display: inline-block;
-  margin-top: 14px;
-  padding: 4px 12px;
-  background: var(--bg-inset);
-  border: 1px solid var(--border);
-  border-radius: 100px;
-  font-size: 12px;
-  color: var(--accent-cyan);
-  font-family: "JetBrains Mono", monospace;
-}
-
-/* ========== Pain Points ========== */
-.pain-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-top: 8px;
-}
-
-.pain-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 22px 24px;
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  transition: all 0.25s ease;
-}
-
-.pain-card:hover {
-  border-color: var(--accent-rose);
-  background: var(--bg-card-hover);
-}
-
-.pain-card .pain-icon {
-  flex-shrink: 0;
-  width: 38px; height: 38px;
-  border-radius: 50%;
-  background: rgba(251,113,133,0.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--accent-rose);
-  font-size: 18px;
-  font-weight: 700;
-  font-family: "JetBrains Mono", monospace;
-}
-
-.pain-card .pain-body h4 {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 4px;
-}
-
-.pain-card .pain-body p {
-  font-size: 13px;
-  color: var(--text-muted);
-  line-height: 1.65;
-}
-
-/* ========== Value ========== */
-.value-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-
-.value-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 30px 26px;
-  text-align: center;
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.value-card:hover {
-  border-color: var(--accent-green-deep);
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-glow-cyan);
-}
-
-.value-card .v-icon {
-  width: 56px; height: 56px;
-  margin: 0 auto 18px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-}
-
-.value-card:nth-child(1) .v-icon { background: rgba(52,211,153,0.12); color: var(--accent-green); }
-.value-card:nth-child(2) .v-icon { background: rgba(167,139,250,0.12); color: var(--accent-violet); }
-.value-card:nth-child(3) .v-icon { background: rgba(251,191,36,0.12); color: var(--accent-amber); }
-
-.value-card h3 {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 10px;
-}
-
-.value-card p {
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-
-.value-card .v-highlight {
-  display: inline-block;
-  margin-top: 14px;
-  padding: 4px 14px;
-  border-radius: 100px;
-  font-size: 12px;
-  font-weight: 600;
-  font-family: "JetBrains Mono", monospace;
-}
-
-.value-card:nth-child(1) .v-highlight { background: rgba(52,211,153,0.12); color: var(--accent-green); }
-.value-card:nth-child(2) .v-highlight { background: rgba(167,139,250,0.12); color: var(--accent-violet); }
-.value-card:nth-child(3) .v-highlight { background: rgba(251,191,36,0.12); color: var(--accent-amber); }
-
-/* ========== Features (6 cards) ========== */
-.feature-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-}
-
-.feature-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 26px 24px;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.feature-card::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0;
-  width: 0; height: 2px;
-  background: var(--gradient-indigo-cyan);
-  transition: width 0.4s ease;
-}
-
-.feature-card:hover {
-  border-color: var(--accent-indigo);
-  background: var(--bg-card-hover);
-  transform: translateY(-3px);
-}
-
-.feature-card:hover::after {
-  width: 100%;
-}
-
-.feature-card .f-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.feature-card .f-icon {
-  width: 40px; height: 40px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.feature-card .f-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.feature-card .f-desc {
-  font-size: 13.5px;
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-
-.feature-card .f-code {
-  margin-top: 12px;
-  padding: 10px 14px;
-  background: var(--bg-inset);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: 12px;
-  color: var(--accent-cyan);
-  font-family: "JetBrains Mono", monospace;
-  overflow-x: auto;
-  white-space: nowrap;
-}
-
-/* Color variants for feature icons */
-.f-icon.c1 { background: rgba(99,102,241,0.15); color: var(--accent-indigo-bright); }
-.f-icon.c2 { background: rgba(52,211,153,0.15); color: var(--accent-green); }
-.f-icon.c3 { background: rgba(34,211,238,0.15); color: var(--accent-cyan); }
-.f-icon.c4 { background: rgba(251,191,36,0.15); color: var(--accent-amber); }
-.f-icon.c5 { background: rgba(167,139,250,0.15); color: var(--accent-violet); }
-.f-icon.c6 { background: rgba(251,113,133,0.15); color: var(--accent-rose); }
-
-/* ========== Six Dimensions ========== */
-.dim-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-}
-
-.dim-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 26px 24px;
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.dim-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-glow-indigo);
-}
-
-.dim-card .dim-num {
-  position: absolute;
-  top: 18px; right: 22px;
-  font-size: 36px;
-  font-weight: 800;
-  color: rgba(255,255,255,0.04);
-  font-family: "JetBrains Mono", monospace;
-  line-height: 1;
-}
-
-.dim-card .dim-icon {
-  width: 48px; height: 48px;
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
-}
-
-.dim-card h3 {
-  font-size: 16px;
+  font-size: 28px;
   font-weight: 700;
   margin-bottom: 8px;
   color: var(--text-primary);
 }
-
-.dim-card .dim-tag {
-  font-size: 11px;
+.section-title .num {
+  display: inline-block;
+  width: 32px; height: 32px;
+  line-height: 32px;
+  text-align: center;
+  background: var(--gradient-indigo-cyan);
+  border-radius: 50%;
+  font-size: 14px;
+  color: white;
+  margin-right: 12px;
+  vertical-align: middle;
+}
+.section-subtitle {
   color: var(--text-muted);
-  font-family: "JetBrains Mono", monospace;
-  margin-bottom: 10px;
+  font-size: 15px;
+  margin-bottom: 36px;
+  margin-left: 44px;
 }
 
-.dim-card p {
+/* ========== Cards ========== */
+.card-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.card-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  transition: all 0.3s ease;
+}
+.card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-light);
+  transform: translateY(-2px);
+}
+.card-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+.card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+.card p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+.card-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 12px;
+  font-family: monospace;
+}
+
+/* ========== Callout ========== */
+.callout {
+  background: var(--bg-inset);
+  border-left: 3px solid var(--accent-indigo);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 20px 24px;
+  margin: 24px 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+.callout strong { color: var(--text-primary); }
+.callout-amber {
+  border-left-color: var(--accent-amber);
+}
+.callout-cyan {
+  border-left-color: var(--accent-cyan);
+}
+.callout-rose {
+  border-left-color: var(--accent-rose);
+}
+
+/* ========== Comparison Table ========== */
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.comparison-table th {
+  background: var(--bg-inset);
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
   font-size: 13px;
+}
+.comparison-table th.highlight {
+  background: rgba(99,102,241,0.12);
+  color: var(--accent-indigo-bright);
+}
+.comparison-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.comparison-table td.highlight {
+  background: rgba(99,102,241,0.05);
+  color: var(--text-primary);
+}
+.comparison-table tr:last-child td { border-bottom: none; }
+.check { color: var(--accent-green); font-weight: 600; }
+.cross { color: var(--accent-rose); font-weight: 600; }
+.partial { color: var(--accent-amber); font-weight: 600; }
+
+/* ========== Timeline ========== */
+.timeline {
+  position: relative;
+  padding-left: 32px;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+.timeline-item {
+  position: relative;
+  margin-bottom: 28px;
+}
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -28px; top: 6px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--bg-base);
+  border: 2px solid var(--accent-indigo);
+}
+.timeline-item.gap::before {
+  border-color: var(--accent-green);
+  background: var(--accent-green);
+  box-shadow: 0 0 12px rgba(52,211,153,0.4);
+}
+.timeline-item h4 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+.timeline-item .era {
+  font-size: 12px;
+  color: var(--accent-cyan);
+  margin-bottom: 4px;
+}
+.timeline-item p {
+  font-size: 14px;
   color: var(--text-secondary);
   line-height: 1.7;
 }
 
-.dim-card .dim-example {
-  margin-top: 12px;
-  padding: 10px 12px;
-  background: var(--bg-inset);
-  border-left: 3px solid;
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  font-size: 12px;
-  font-family: "JetBrains Mono", monospace;
-  color: var(--text-secondary);
-  line-height: 1.6;
+/* ========== Flow ========== */
+.flow-steps {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 24px 0;
 }
-
-.dim-card.d1 .dim-icon { background: rgba(99,102,241,0.15); color: var(--accent-indigo-bright); }
-.dim-card.d1 .dim-example { border-left-color: var(--accent-indigo-bright); }
-.dim-card.d2 .dim-icon { background: rgba(251,113,133,0.15); color: var(--accent-rose); }
-.dim-card.d2 .dim-example { border-left-color: var(--accent-rose); }
-.dim-card.d3 .dim-icon { background: rgba(34,211,238,0.15); color: var(--accent-cyan); }
-.dim-card.d3 .dim-example { border-left-color: var(--accent-cyan); }
-.dim-card.d4 .dim-icon { background: rgba(52,211,153,0.15); color: var(--accent-green); }
-.dim-card.d4 .dim-example { border-left-color: var(--accent-green); }
-.dim-card.d5 .dim-icon { background: rgba(167,139,250,0.15); color: var(--accent-violet); }
-.dim-card.d5 .dim-example { border-left-color: var(--accent-violet); }
-.dim-card.d6 .dim-icon { background: rgba(251,191,36,0.15); color: var(--accent-amber); }
-.dim-card.d6 .dim-example { border-left-color: var(--accent-amber); }
-
-/* ========== Workflow ========== */
-.workflow-container {
+.flow-step {
+  flex: 1;
+  min-width: 120px;
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 36px 28px;
-  box-shadow: var(--shadow-card);
-}
-
-.workflow-flow {
-  display: flex;
-  align-items: stretch;
-  gap: 0;
-  overflow-x: auto;
-  padding-bottom: 8px;
-}
-
-.workflow-step {
-  flex: 1;
-  min-width: 130px;
+  border-radius: var(--radius-sm);
+  padding: 16px;
   text-align: center;
   position: relative;
-  padding: 0 8px;
 }
-
-.workflow-step .ws-circle {
-  width: 64px; height: 64px;
+.flow-step-num {
+  width: 28px; height: 28px;
+  line-height: 28px;
   border-radius: 50%;
-  margin: 0 auto 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
-  font-family: "JetBrains Mono", monospace;
-  border: 2px solid;
-  background: var(--bg-card);
-  position: relative;
-  z-index: 2;
-  transition: all 0.3s ease;
+  background: var(--bg-inset);
+  border: 1px solid var(--accent-indigo);
+  color: var(--accent-indigo-bright);
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 auto 10px;
 }
-
-.workflow-step:hover .ws-circle {
-  transform: scale(1.08);
-  box-shadow: 0 0 20px rgba(99,102,241,0.3);
+.flow-step h4 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
 }
-
-.workflow-step .ws-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 6px;
-}
-
-.workflow-step .ws-desc {
+.flow-step p {
   font-size: 12px;
   color: var(--text-muted);
-  line-height: 1.6;
-  padding: 0 4px;
-}
-
-/* Connector lines */
-.workflow-step:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  top: 32px;
-  left: calc(50% + 36px);
-  right: calc(-50% + 36px);
-  height: 2px;
-  background: var(--border-light);
-  z-index: 1;
-}
-
-.workflow-step:not(:last-child)::before {
-  content: '';
-  position: absolute;
-  top: 27px;
-  right: calc(-50% + 28px);
-  width: 0; height: 0;
-  border-left: 8px solid var(--border-light);
-  border-top: 5px solid transparent;
-  border-bottom: 5px solid transparent;
-  z-index: 1;
-}
-
-/* Step colors */
-.ws-step1 .ws-circle { border-color: var(--accent-indigo-bright); color: var(--accent-indigo-bright); background: rgba(99,102,241,0.08); }
-.ws-step2 .ws-circle { border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(34,211,238,0.08); }
-.ws-step3 .ws-circle { border-color: var(--accent-amber); color: var(--accent-amber); background: rgba(251,191,36,0.08); }
-.ws-step4 .ws-circle { border-color: var(--accent-green); color: var(--accent-green); background: rgba(52,211,153,0.08); }
-.ws-step5 .ws-circle { border-color: var(--accent-violet); color: var(--accent-violet); background: rgba(167,139,250,0.08); }
-.ws-step6 .ws-circle { border-color: var(--accent-rose); color: var(--accent-rose); background: rgba(251,113,133,0.08); }
-
-/* ========== Comparison Table ========== */
-.comparison-wrap {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
-}
-
-.comparison-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.comparison-table th,
-.comparison-table td {
-  padding: 16px 20px;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-  font-size: 14px;
-}
-
-.comparison-table thead th {
-  background: var(--bg-inset);
-  font-weight: 700;
-  color: var(--text-secondary);
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 2px solid var(--border-light);
-}
-
-.comparison-table thead th.highlight-col {
-  color: var(--accent-cyan);
-  background: rgba(34,211,238,0.06);
-}
-
-.comparison-table tbody tr {
-  transition: background 0.2s ease;
-}
-
-.comparison-table tbody tr:hover {
-  background: var(--bg-card-hover);
-}
-
-.comparison-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.comparison-table td.highlight-col {
-  background: rgba(34,211,238,0.04);
-  color: var(--text-primary);
-  font-weight: 500;
-}
-
-.comparison-table td:first-child {
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.comparison-table .check { color: var(--accent-green); font-weight: 700; }
-.comparison-table .cross { color: var(--accent-rose); font-weight: 700; }
-.comparison-table .partial { color: var(--accent-amber); font-weight: 700; }
-
-.comparison-table .row-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.comparison-table .row-icon {
-  width: 28px; height: 28px;
-  border-radius: 6px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
-  font-family: "JetBrains Mono", monospace;
-  flex-shrink: 0;
 }
 
 /* ========== Code Block ========== */
 .code-block {
   background: var(--bg-inset);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 20px 24px;
-  margin-top: 24px;
-  overflow-x: auto;
-  position: relative;
-}
-
-.code-block::before {
-  content: 'DEV_MEMORY.md';
-  position: absolute;
-  top: 10px; right: 16px;
-  font-size: 11px;
-  color: var(--text-muted);
-  font-family: "JetBrains Mono", monospace;
-}
-
-.code-block pre {
-  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  margin: 20px 0;
   font-size: 13px;
   line-height: 1.8;
   color: var(--text-secondary);
+  overflow-x: auto;
+  white-space: pre;
 }
+.code-block .kw { color: var(--accent-violet); }
+.code-block .str { color: var(--accent-green); }
+.code-block .cmt { color: var(--text-muted); }
+.code-block .fn { color: var(--accent-cyan); }
+.code-block .dim { color: var(--accent-amber); }
 
-.code-block .c-comment { color: var(--text-muted); }
-.code-block .c-key { color: var(--accent-indigo-bright); }
-.code-block .c-val { color: var(--accent-green); }
-.code-block .c-time { color: var(--accent-cyan); }
-.code-block .c-status { color: var(--accent-amber); }
+/* ========== Feature Tags ========== */
+.feature-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+.feature-tag {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.tag-indigo { background: rgba(99,102,241,0.12); color: var(--accent-indigo-bright); }
+.tag-cyan { background: rgba(34,211,238,0.12); color: var(--accent-cyan); }
+.tag-green { background: rgba(52,211,153,0.12); color: var(--accent-green); }
+.tag-amber { background: rgba(251,191,36,0.12); color: var(--accent-amber); }
+.tag-rose { background: rgba(251,113,133,0.12); color: var(--accent-rose); }
+.tag-violet { background: rgba(167,139,250,0.12); color: var(--accent-violet); }
+
+/* ========== Evolution Section ========== */
+.evolution-diagram {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0;
+  flex-wrap: wrap;
+}
+.evo-box {
+  flex: 1;
+  min-width: 200px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+.evo-box h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.evo-box p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.evo-arrow {
+  font-size: 24px;
+  color: var(--accent-indigo);
+}
+.evo-plus {
+  font-size: 28px;
+  color: var(--accent-cyan);
+  font-weight: 300;
+}
+.evo-equals {
+  font-size: 28px;
+  color: var(--accent-green);
+  font-weight: 300;
+}
 
 /* ========== Footer ========== */
 .footer {
   text-align: center;
-  padding: 40px 24px;
-  background: var(--bg-deep);
+  padding: 48px 0 40px;
   border-top: 1px solid var(--border);
-}
-
-.footer p {
+  color: var(--text-muted);
   font-size: 13px;
-  color: var(--text-muted);
-  line-height: 1.8;
 }
-
-.footer .footer-brand {
-  font-size: 15px;
-  color: var(--accent-indigo-bright);
-  font-weight: 700;
-  margin-bottom: 6px;
-  font-family: "JetBrains Mono", monospace;
-}
-
-.footer .footer-meta {
-  font-size: 12px;
-  color: var(--text-muted);
-  letter-spacing: 0.5px;
+.footer a {
+  color: var(--accent-cyan);
+  text-decoration: none;
 }
 
 /* ========== Responsive ========== */
-@media (max-width: 900px) {
-  .intro-grid, .value-grid, .feature-grid, .dim-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .hero h1 { font-size: 38px; }
+@media (max-width: 768px) {
+  .hero h1 { font-size: 36px; }
   .hero-tagline { font-size: 16px; }
-}
-
-@media (max-width: 640px) {
-  .container { padding: 0 16px; }
-  .hero { padding: 50px 16px 40px; }
-  .hero h1 { font-size: 30px; }
-  .hero-tagline { font-size: 15px; }
-  .hero-stats { gap: 28px; }
-  .section { padding: 44px 0; }
+  .card-grid-3, .card-grid-2 { grid-template-columns: 1fr; }
+  .hero-stats { gap: 24px; }
   .section-title { font-size: 22px; }
-  .intro-grid, .value-grid, .feature-grid, .dim-grid, .pain-grid {
-    grid-template-columns: 1fr;
-  }
-  .workflow-flow {
-    flex-direction: column;
-    gap: 12px;
-  }
-  .workflow-step:not(:last-child)::after,
-  .workflow-step:not(:last-child)::before {
-    display: none;
-  }
-  .workflow-step {
-    display: flex;
-    align-items: center;
-    text-align: left;
-    gap: 16px;
-    min-width: auto;
-    padding: 8px 0;
-  }
-  .workflow-step .ws-circle { margin: 0; }
-  .comparison-table { font-size: 12px; }
-  .comparison-table th, .comparison-table td { padding: 10px 12px; }
+  .evolution-diagram { flex-direction: column; }
+  .evo-arrow, .evo-plus, .evo-equals { transform: rotate(90deg); }
 }
 </style>
 </head>
 <body>
 
-<!-- ========== HERO ========== -->
+<!-- ========== Hero ========== -->
 <section class="hero">
-  <div class="hero-content">
-    <div class="hero-badge">
-      <span class="dot"></span>
-      TRAE AI 创造力大赛 · 学习工作赛道
-    </div>
-    <h1 class="hero-mono">dev-memory</h1>
-    <p class="hero-tagline">
-      让 AI 编程助手拥有<strong>长期记忆</strong>，换工具不丢知识，换协作者不丢上下文
-    </p>
+  <div class="container">
+    <div class="hero-badge">TRAE AI 创造力大赛 · 学习工作赛道</div>
+    <h1>dev-memory</h1>
+    <p class="hero-tagline">项目级 AI 记忆系统 —— 把开发记忆变成随项目走的轻量资产，不绑账号、不绑工具、不绑平台。</p>
     <div class="hero-stats">
       <div class="hero-stat">
-        <div class="num">6</div>
-        <div class="label">记忆维度</div>
+        <div class="hero-stat-num">6</div>
+        <div class="hero-stat-label">记忆维度</div>
       </div>
       <div class="hero-stat">
-        <div class="num">0</div>
-        <div class="label">外部依赖</div>
+        <div class="hero-stat-num">0</div>
+        <div class="hero-stat-label">外部依赖</div>
       </div>
       <div class="hero-stat">
-        <div class="num">.md</div>
-        <div class="label">纯Markdown</div>
+        <div class="hero-stat-num">.md</div>
+        <div class="hero-stat-label">纯文件格式</div>
       </div>
       <div class="hero-stat">
-        <div class="num">6</div>
-        <div class="label">步执行流程</div>
+        <div class="hero-stat-num">∞</div>
+        <div class="hero-stat-label">自我进化</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ========== 创意介绍 ========== -->
+<!-- ========== 1. 创意介绍 ========== -->
 <section class="section">
   <div class="container">
-    <div class="section-header">
-      <span class="section-eyebrow">01 / Creative Intro</span>
-      <h2 class="section-title">创意介绍</h2>
-      <p class="section-subtitle">从真实开发痛点出发，用一个轻量 Skill 解决 AI 编程助手的"失忆"问题。</p>
+    <h2 class="section-title"><span class="num">1</span>创意介绍</h2>
+    <p class="section-subtitle">为什么我们需要一个"项目级"的 AI 记忆系统</p>
+
+    <div class="callout callout-amber">
+      <strong>核心洞察：</strong>AI 行业发展至今，已经有针对"用户"的记忆系统（如 ChatGPT 的 Memory），也有针对"Agent 工具"的记忆系统（如 Claude Code 的 CLAUDE.md、Hermes Agent 的四层记忆）。但始终缺失一环——<strong>针对"项目和设备"的记忆系统</strong>。而恰恰只有项目代码和本地设备，才是开发者真正拥有、不会因外部因素而失去的资产。
     </div>
 
-    <div class="intro-grid">
-      <div class="intro-card">
-        <div class="icon-wrap indigo">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="12"/>
-            <line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-        </div>
-        <h3>想解决的问题</h3>
-        <p>AI 编程助手（TRAE、Cursor、Copilot）的对话记忆是<strong style="color:var(--accent-rose);">短时记忆</strong>——每次对话结束后，本次开发中积累的实现思路、踩坑经验、架构决策等知识就消失了。下次对话又得从头探索，浪费大量算力和时间。</p>
-        <span class="tag">核心痛点：知识随对话消失</span>
-      </div>
+    <h3 style="font-size:17px; margin: 28px 0 12px; color: var(--text-primary);">想解决的问题</h3>
+    <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.9; margin-bottom: 16px;">
+      用 AI 编程助手开发项目时，每一轮对话都会积累大量隐性知识：为什么选了这个方案、踩过什么坑、API 参数怎么调对、架构上做了哪些取舍。但这些知识存在对话上下文里，对话一结束就蒸发了。下次开新对话，AI 两眼一抹黑，你刚解决过的坑它再踩一遍，你刚论证过的方案它再质疑一圈。算力在重复探索中白白消耗，开发节奏被反复打断。
+    </p>
+    <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.9; margin-bottom: 16px;">
+      更深层的问题在于，现有的记忆方案全部绑定在某个特定载体上——要么绑账号（ChatGPT Memory 跟着 OpenAI 账号走），要么绑工具（Claude Code 的 CLAUDE.md 离开 Claude Code 就没人读）。可现实是，AI 行业产品迭代极快，今天用的工具明天可能就变了，账号也可能因为各种原因需要切换。我自己就经常在多个 AI 编程工具和账号之间来回切换。工具和账号都是流动的，只有<strong>本地设备和项目代码</strong>是真正稳定的锚点。
+    </p>
 
-      <div class="intro-card">
-        <div class="icon-wrap cyan">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-          </svg>
-        </div>
-        <h3>动机</h3>
-        <p>在开发 <strong style="color:var(--accent-cyan);">kpl-dashboard</strong> 项目时发现：换一个新对话后，AI 不知道之前做了什么——不知道东方财富 API 的正确参数、不知道连板高度为什么要放右轴、不知道之前踩过的坑。重复探索浪费算力，重复踩坑浪费时间。</p>
-        <span class="tag">真实项目验证</span>
-      </div>
+    <h3 style="font-size:17px; margin: 28px 0 12px; color: var(--text-primary);">动机与灵感</h3>
+    <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.9; margin-bottom: 16px;">
+      这个想法来自一个很具体的痛点。我在用 AI 助手开发一个数据分析项目时，前一轮对话刚花了不少时间排查一个第三方 API 的参数问题，终于找到了正确的调用方式。结果下一轮新对话，AI 又从头试错，把走通的路重走了一遍。那一刻我意识到，AI 缺的不是能力，是记忆。
+    </p>
+    <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.9;">
+      我开始研究现有的记忆方案，发现一个有意思的现象：记忆系统在 AI 领域并不新鲜，但所有人都在往"更高层"做——用户层的个性化记忆、Agent 层的技能积累。没人往下看一层：项目本身需要什么记忆？那些跟着代码走、不跟账号走、不跟工具走的记忆，应该放在哪里？答案其实很简单——放在项目目录里，用最朴素的 Markdown 文件，跟着 Git 一起版本管理。
+    </p>
 
-      <div class="intro-card">
-        <div class="icon-wrap green">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <line x1="9" y1="13" x2="15" y2="13"/>
-            <line x1="9" y1="17" x2="15" y2="17"/>
-          </svg>
-        </div>
-        <h3>产品形态</h3>
-        <p>一个 <strong style="color:var(--accent-green);">TRAE Skill 技能</strong>，纯 Markdown 文件，零依赖。安装后对话结束时自动触发，提取六维开发记忆，保存到项目目录的 <code style="color:var(--accent-cyan);">docs/dev-memory/</code> 下，随代码版本管理。</p>
-        <span class="tag">SKILL.md · 零依赖</span>
+    <h3 style="font-size:17px; margin: 28px 0 12px; color: var(--text-primary);">产品形态</h3>
+    <div class="card-grid-3">
+      <div class="card">
+        <div class="card-icon" style="background: rgba(99,102,241,0.12); color: var(--accent-indigo-bright);">⚡</div>
+        <h3>TRAE Skill 技能</h3>
+        <p>一个 SKILL.md 文件就是全部。纯指令驱动，AI 读取后自动执行记忆提取流程，无需安装任何运行时或依赖。</p>
+        <span class="card-tag">零脚本</span>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background: rgba(34,211,238,0.12); color: var(--accent-cyan);">📄</div>
+        <h3>纯 Markdown 输出</h3>
+        <p>记忆文件就是普通的 .md 文件。任何编辑器能看，任何 AI 工具能读，任何 Git 仓库能管。二十年不过时。</p>
+        <span class="card-tag">.md only</span>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background: rgba(52,211,153,0.12); color: var(--accent-green);">🔄</div>
+        <h3>自我进化</h3>
+        <p>Skill 自身带迭代记录区域，每次执行后自动检查是否有可改进之处，发现不足就更新自己的指令。</p>
+        <span class="card-tag">self-evolving</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ========== 目标用户及痛点 ========== -->
-<section class="section">
+<!-- ========== 2. AI 记忆的历史脉络 ========== -->
+<section class="section" style="background: var(--bg-deep);">
   <div class="container">
-    <div class="section-header">
-      <span class="section-eyebrow">02 / Target Users</span>
-      <h2 class="section-title">目标用户及痛点</h2>
-      <p class="section-subtitle">面向所有使用 AI 编程助手进行项目开发的开发者，尤其是跨对话、跨工具、跨协作者协作的场景。</p>
+    <h2 class="section-title"><span class="num">2</span>AI 记忆的历史脉络</h2>
+    <p class="section-subtitle">从用户记忆到 Agent 记忆，缺的恰恰是项目记忆</p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="era">2023 — 2024</div>
+        <h4>用户级记忆：记住"你是谁"</h4>
+        <p>ChatGPT 率先推出 Memory 功能，记住用户的偏好、习惯、背景信息。这类记忆绑在用户账号上，跨对话生效，但换个平台就没了。它解决的是"AI 了解你"的问题，不解决"AI 了解你的项目"的问题。</p>
+      </div>
+      <div class="timeline-item">
+        <div class="era">2025 — 2026 初</div>
+        <h4>Agent 级记忆：记住"怎么干活"</h4>
+        <p>Claude Code 推出 CLAUDE.md 和 Auto Memory，把构建命令、代码习惯、架构约定存在项目目录里。Hermes Agent 更进一步，搞了四层自进化记忆体系——运行时技能积累、系统级优化、模型级训练，号称"越用越聪明"。但这些记忆要么锁死在特定工具里，要么需要重型框架支撑。</p>
+      </div>
+      <div class="timeline-item gap">
+        <div class="era">2026 · dev-memory</div>
+        <h4>项目级记忆：记住"这个项目经历了什么"</h4>
+        <p>把记忆的归属权从账号和工具上拿下来，放到项目和设备这一层。记忆文件住在项目目录里，跟着代码走，不绑任何平台。任何 AI 工具来了都能读，工具换了记忆还在。同时借鉴 Hermes 的自我进化思路，让 Skill 自身也能迭代——但用最轻量的方式实现，不需要框架，不需要运行时，一个 Markdown 文件搞定。</p>
+      </div>
     </div>
 
-    <div class="pain-grid">
-      <div class="pain-card">
-        <div class="pain-icon">!</div>
-        <div class="pain-body">
-          <h4>新开对话 — AI"失忆"</h4>
-          <p>AI 不知道之前做了什么，不了解项目当前状态、已做的决策、已踩的坑。每次新对话都要重新描述背景，重新探索方案。</p>
-        </div>
-      </div>
-
-      <div class="pain-card">
-        <div class="pain-icon">!</div>
-        <div class="pain-body">
-          <h4>换 AI 工具 — 记忆丢失</h4>
-          <p>TRAE 内置 memory 是工具级记忆，存在 <code style="color:var(--accent-cyan);">~/.trae-cn/memory/</code>。换到 Cursor、Copilot 后，所有项目记忆全部丢失，从零开始。</p>
-        </div>
-      </div>
-
-      <div class="pain-card">
-        <div class="pain-icon">!</div>
-        <div class="pain-body">
-          <h4>换协作者 — 上下文断裂</h4>
-          <p>团队成员接手项目时，不知道之前的架构决策原因、踩过哪些坑、哪些方案尝试过又放弃了。口述或写文档容易遗漏关键细节。</p>
-        </div>
-      </div>
-
-      <div class="pain-card">
-        <div class="pain-icon">!</div>
-        <div class="pain-body">
-          <h4>调试问题 — 重复踩坑</h4>
-          <p>同一个 API 参数错误、同一个环境配置问题，在不同对话中被反复遇到、反复调试。已解决过的坑没有沉淀，算力和时间白白浪费。</p>
-        </div>
-      </div>
+    <div class="callout">
+      <strong>三层记忆的互补关系：</strong>用户级记忆解决"AI 认识你"，Agent 级记忆解决"AI 会干活"，项目级记忆解决"AI 懂这个项目的来龙去脉"。三者不冲突，但项目级记忆是目前缺失的那一环——而且是最稳定、最该被沉淀的那一环。
     </div>
   </div>
 </section>
 
-<!-- ========== 价值与意义 ========== -->
+<!-- ========== 3. 为什么是现在 ========== -->
 <section class="section">
   <div class="container">
-    <div class="section-header">
-      <span class="section-eyebrow">03 / Value & Impact</span>
-      <h2 class="section-title">价值与意义</h2>
-      <p class="section-subtitle">不仅是效率工具，更是知识资产——让开发记忆成为可传承、可版本化、可进化的项目资产。</p>
+    <h2 class="section-title"><span class="num">3</span>为什么是现在</h2>
+    <p class="section-subtitle">AI 工具快速迭代的时代，稳定性反而成了稀缺品</p>
+
+    <div class="card-grid-2">
+      <div class="card">
+        <div class="card-icon" style="background: rgba(251,113,133,0.12); color: var(--accent-rose);">🔄</div>
+        <h3>工具在变</h3>
+        <p>AI 编程领域半年一个格局。今天的主力工具，半年后可能就被替代了。绑在特定工具上的记忆，工具一换就归零。开发者需要的是工具无关的记忆载体。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background: rgba(251,191,36,0.12); color: var(--accent-amber);">👤</div>
+        <h3>账号在变</h3>
+        <p>且不说多平台切换的常态，单是国内开发者面临的访问限制就够头疼了。某些海外工具对中国用户区别对待已经不是秘密——近期 Claude Code 被曝出在代码中植入针对中国用户的隐蔽检测逻辑，这件事让很多人意识到，把记忆托管给特定平台是有风险的。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background: rgba(99,102,241,0.12); color: var(--accent-indigo-bright);">💻</div>
+        <h3>设备和项目不变</h3>
+        <p>不管外部环境怎么变，你的电脑还在，你的项目代码还在。把记忆放在项目目录里，就是放在了最稳定的锚点上。这是开发者真正"拥有"的东西。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background: rgba(52,211,153,0.12); color: var(--accent-green);">📦</div>
+        <h3>轻量即可移植</h3>
+        <p>不需要数据库，不需要服务端，不需要 API。几个 Markdown 文件，打了个包就能带走。新项目复制一份 SKILL.md 就能启用。可移植性不是设计出来的，是"没什么不能移植"。</p>
+      </div>
     </div>
 
-    <div class="value-grid">
-      <div class="value-card">
-        <div class="v-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-          </svg>
-        </div>
-        <h3>效率提升</h3>
-        <p>避免重复探索和重复踩坑。新对话开始时 AI 读取记忆文件，立即了解项目全貌，直接从上次的结论继续，不再从零开始。</p>
-        <span class="v-highlight">节省算力 / 节省时间</span>
-      </div>
-
-      <div class="value-card">
-        <div class="v-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-          </svg>
-        </div>
-        <h3>知识传承</h3>
-        <p>记忆文件保存在项目目录内，随 Git 版本管理。每一次决策、每一个踩坑、每一条结论都有时间戳记录，完整保留知识演进轨迹。</p>
-        <span class="v-highlight">随项目走 / 随 Git 管</span>
-      </div>
-
-      <div class="value-card">
-        <div class="v-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-            <path d="M2 17l10 5 10-5"/>
-            <path d="M2 12l10 5 10-5"/>
-          </svg>
-        </div>
-        <h3>商业价值</h3>
-        <p>作为 TRAE 生态 Skill 标配，可随项目分发。每个用 TRAE 开发的项目都能自带记忆，降低团队协作门槛，提升 TRAE 平台的用户粘性。</p>
-        <span class="v-highlight">生态标配 / 平台粘性</span>
-      </div>
+    <div class="callout callout-rose">
+      <strong>现实背景：</strong>2026 年 7 月，Claude Code 被安全研究者逆向分析后发现，其客户端代码中包含针对中国用户、中国代理网络和中国 AI 公司环境的隐蔽检测与标记逻辑。这意味着依赖单一海外工具的记忆体系存在不可控风险。dev-memory 的价值在于：记忆归你所有，存在你的项目里，不经过任何第三方。
     </div>
   </div>
 </section>
 
-<!-- ========== 核心特性展示 ========== -->
-<section class="section">
+<!-- ========== 4. 核心设计：融合 Claude Code 与 Hermes ========== -->
+<section class="section" style="background: var(--bg-deep);">
   <div class="container">
-    <div class="section-header">
-      <span class="section-eyebrow">04 / Core Features</span>
-      <h2 class="section-title">核心特性</h2>
-      <p class="section-subtitle">六大核心特性，构建从提取、存储、归档到自我进化的完整记忆闭环。</p>
+    <h2 class="section-title"><span class="num">4</span>核心设计理念</h2>
+    <p class="section-subtitle">一个 Skill，融合两种范式的长处</p>
+
+    <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.9; margin-bottom: 24px;">
+      dev-memory 不是从零发明的东西。它站在两个已有的成熟方案肩上，取其精华，去其重量。
+    </p>
+
+    <div class="evolution-diagram">
+      <div class="evo-box" style="border-color: rgba(99,102,241,0.3);">
+        <h4 style="color: var(--accent-indigo-bright);">Claude Code · 项目记忆</h4>
+        <p>把记忆存在项目目录里，跟着代码走。AI 自动维护，不需要手动写。但锁死在 Claude Code 工具内，换工具即失效。</p>
+        <div class="feature-tags">
+          <span class="feature-tag tag-indigo">项目目录存储</span>
+          <span class="feature-tag tag-indigo">自动维护</span>
+        </div>
+      </div>
+      <div class="evo-plus">+</div>
+      <div class="evo-box" style="border-color: rgba(34,211,238,0.3);">
+        <h4 style="color: var(--accent-cyan);">Hermes Agent · 自我进化</h4>
+        <p>Agent 在使用过程中积累技能、优化策略，越用越强。但需要完整的 Agent 框架支撑，重，且绑平台。</p>
+        <div class="feature-tags">
+          <span class="feature-tag tag-cyan">自我进化</span>
+          <span class="feature-tag tag-cyan">迭代记录</span>
+        </div>
+      </div>
+      <div class="evo-equals">=</div>
+      <div class="evo-box" style="border-color: rgba(52,211,153,0.3); background: rgba(52,211,153,0.04);">
+        <h4 style="color: var(--accent-green);">dev-memory</h4>
+        <p>取 Claude Code 的"项目目录存储 + 自动维护"，取 Hermes 的"自我进化 + 迭代记录"，用纯 Markdown Skill 实现，不绑任何工具。</p>
+        <div class="feature-tags">
+          <span class="feature-tag tag-green">项目级</span>
+          <span class="feature-tag tag-green">自动维护</span>
+          <span class="feature-tag tag-green">自我进化</span>
+          <span class="feature-tag tag-green">工具无关</span>
+        </div>
+      </div>
     </div>
 
-    <div class="feature-grid">
-      <div class="feature-card">
-        <div class="f-header">
-          <div class="f-icon c1">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="12 2 2 7 12 12 22 7 12 2"/>
-              <polyline points="2 17 12 22 22 17"/>
-              <polyline points="2 12 12 17 22 12"/>
-            </svg>
-          </div>
-          <div class="f-title">六维记忆提取</div>
-        </div>
-        <div class="f-desc">从对话上下文中自动提取六个维度的开发记忆：任务摘要、踩坑记录、探索路径、最终结论、架构决策、环境信息。每个维度有明确的格式和提取规则。</div>
-        <div class="f-code">6 dimensions · auto-extract</div>
-      </div>
-
-      <div class="feature-card">
-        <div class="f-header">
-          <div class="f-icon c2">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="12" y1="18" x2="12" y2="12"/>
-              <polyline points="9 15 12 12 15 15"/>
-            </svg>
-          </div>
-          <div class="f-title">追加式演进</div>
-        </div>
-        <div class="f-desc">旧记忆永不删除，只追加更正说明。发现旧记忆有错误、矛盾或过时时，在"历史更正记录"中追加更正，完整保留知识演进轨迹。</div>
-        <div class="f-code">append-only · never delete</div>
-      </div>
-
-      <div class="feature-card">
-        <div class="f-header">
-          <div class="f-icon c3">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="16 18 22 12 16 6"/>
-              <polyline points="8 6 2 12 8 18"/>
-            </svg>
-          </div>
-          <div class="f-title">零依赖</div>
-        </div>
-        <div class="f-desc">纯 Markdown 文件操作，不执行任何脚本，不依赖任何外部服务。换任何 AI 工具、任何编辑器都能读取，记忆跟着项目走。</div>
-        <div class="f-code">0 deps · pure markdown</div>
-      </div>
-
-      <div class="feature-card">
-        <div class="f-header">
-          <div class="f-icon c4">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-              <line x1="16" y1="2" x2="16" y2="6"/>
-              <line x1="8" y1="2" x2="8" y2="6"/>
-              <line x1="3" y1="10" x2="21" y2="10"/>
-            </svg>
-          </div>
-          <div class="f-title">按周归档</div>
-        </div>
-        <div class="f-desc">主文件保持精简（每维保留 3-5 条），溢出的旧条目自动归档到按 ISO 周数命名的周文件。主文件始终反映最新状态，历史完整可溯。</div>
-        <div class="f-code">ISO week · archive/YYYY-Www.md</div>
-      </div>
-
-      <div class="feature-card">
-        <div class="f-header">
-          <div class="f-icon c5">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M23 4v6h-6"/>
-              <path d="M1 20v-6h6"/>
-              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/>
-              <path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/>
-            </svg>
-          </div>
-          <div class="f-title">自我进化</div>
-        </div>
-        <div class="f-desc">Skill 自身预留"迭代记录"区域，每次执行时检查是否遇到规则不足、边界情况、提取遗漏等问题，发现改进点则自动更新 SKILL.md 并记录版本。</div>
-        <div class="f-code">self-evolving · v1.0 → v1.x</div>
-      </div>
-
-      <div class="feature-card">
-        <div class="f-header">
-          <div class="f-icon c6">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-              <line x1="12" y1="22.08" x2="12" y2="12"/>
-            </svg>
-          </div>
-          <div class="f-title">自动迁移</div>
-        </div>
-        <div class="f-desc">首次使用时，自动从 TRAE 内置 memory（<code style="font-size:12px;color:var(--accent-cyan);">~/.trae-cn/memory/</code>）迁移已有项目记忆，按维度归类到六维记忆体系中，无需手动搬运。</div>
-        <div class="f-code">auto-migrate from TRAE memory</div>
-      </div>
+    <div class="callout callout-cyan">
+      <strong>关键区别：</strong>Claude Code 的记忆是"工具的功能"，dev-memory 的记忆是"项目的资产"。前者服务于工具，后者服务于项目本身。工具可以换，但项目的记忆不应该跟着工具一起消失。
     </div>
   </div>
 </section>
 
-<!-- ========== 六维记忆维度展示 ========== -->
+<!-- ========== 5. 六维记忆 ========== -->
 <section class="section">
   <div class="container">
-    <div class="section-header">
-      <span class="section-eyebrow">05 / Six Dimensions</span>
-      <h2 class="section-title">六维记忆维度</h2>
-      <p class="section-subtitle">从六个互补维度完整覆盖一次开发会话中的关键知识，每条记忆精确到分钟。</p>
-    </div>
+    <h2 class="section-title"><span class="num">5</span>六维记忆提取</h2>
+    <p class="section-subtitle">每一轮对话结束后，自动从上下文中提取六个维度的开发记忆</p>
 
-    <div class="dim-grid">
-      <div class="dim-card d1">
-        <span class="dim-num">01</span>
-        <div class="dim-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 11l3 3L22 4"/>
-            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-          </svg>
-        </div>
-        <h3>任务摘要</h3>
-        <div class="dim-tag">Task & Changes</div>
-        <p>本次做了什么，1-3 句话概括核心变更。帮助新对话快速了解项目最新进展。</p>
-        <div class="dim-example">[2026-07-10 16:30] 完成7项看板优化：标题修改、涨停分布默认显示...</div>
+    <div class="card-grid-3">
+      <div class="card">
+        <div class="card-icon" style="background: rgba(99,102,241,0.12); color: var(--accent-indigo-bright);">①</div>
+        <h3>任务与变更摘要</h3>
+        <p>这轮对话具体做了什么。1-3 句话概括，不啰嗦但能让人（或 AI）快速回忆起上下文。</p>
       </div>
-
-      <div class="dim-card d2">
-        <span class="dim-num">02</span>
-        <div class="dim-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-            <line x1="12" y1="9" x2="12" y2="13"/>
-            <line x1="12" y1="17" x2="12.01" y2="17"/>
-          </svg>
-        </div>
+      <div class="card">
+        <div class="card-icon" style="background: rgba(251,146,60,0.12); color: var(--accent-orange);">②</div>
         <h3>踩坑记录</h3>
-        <div class="dim-tag">Pitfalls & Fixes</div>
-        <p>遇到什么错误、根因是什么、如何修复。标注已解决或未解决，避免重复踩坑。</p>
-        <div class="dim-example">[2026-07-10 16:30] ✅ API返回rc=205 → 原因: 参数错误 → 修正: ut=7eea...</div>
+        <p>遇到什么错误、根因是什么、怎么修的。标注已解决或未解决。这是最省算力的一维——不再重复踩同一个坑。</p>
       </div>
-
-      <div class="dim-card d3">
-        <span class="dim-num">03</span>
-        <div class="dim-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-          </svg>
-        </div>
+      <div class="card">
+        <div class="card-icon" style="background: rgba(167,139,250,0.12); color: var(--accent-violet);">③</div>
         <h3>探索路径</h3>
-        <div class="dim-tag">Exploration Path</div>
-        <p>尝试了什么方案、为什么放弃或采纳。记录决策的思考过程，而非仅仅最终结果。</p>
-        <div class="dim-example">[2026-07-10 16:00] KPL API(不支持历史) → 东方财富(参数错误) → 修正后成功</div>
+        <p>试了哪些方案、为什么放弃、最终选了什么。记录"不走的路"和"为什么不走"，避免下次又绕进去。</p>
       </div>
-
-      <div class="dim-card d4">
-        <span class="dim-num">04</span>
-        <div class="dim-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-            <polyline points="22 4 12 14.01 9 11.01"/>
-          </svg>
-        </div>
-        <h3>最终结论</h3>
-        <div class="dim-tag">Conclusions & Best Practices</div>
-        <p>当前验证有效的结论和最佳实践。发现更好的结论时追加更正，旧结论保留不删。</p>
-        <div class="dim-example">[2026-07-10 16:30] 东方财富涨停池API正确参数: http + ut=7eea... + dpt=wz.ztzt</div>
+      <div class="card">
+        <div class="card-icon" style="background: rgba(52,211,153,0.12); color: var(--accent-green);">④</div>
+        <h3>最终结论与最佳实践</h3>
+        <p>当前验证有效的结论。比如某个 API 的正确参数、某个配置的最佳值。直接可用，不用再查。</p>
       </div>
-
-      <div class="dim-card d5">
-        <span class="dim-num">05</span>
-        <div class="dim-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-            <line x1="8" y1="21" x2="16" y2="21"/>
-            <line x1="12" y1="17" x2="12" y2="21"/>
-          </svg>
-        </div>
-        <h3>架构决策</h3>
-        <div class="dim-tag">Architecture Decisions</div>
-        <p>为什么选这个方案、放弃了什么、影响范围。让后续开发者理解决策背后的原因。</p>
-        <div class="dim-example">[2026-07-10 16:15] 连板高度放右轴(0-10) → 原因: 左轴数值过大导致不可见</div>
+      <div class="card">
+        <div class="card-icon" style="background: rgba(34,211,238,0.12); color: var(--accent-cyan);">⑤</div>
+        <h3>架构决策记录</h3>
+        <p>为什么选这个方案、放弃了什么、影响范围。防止"这个为什么这么写"的灵魂拷问在三个月后无人能答。</p>
       </div>
-
-      <div class="dim-card d6">
-        <span class="dim-num">06</span>
-        <div class="dim-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-            <line x1="12" y1="22.08" x2="12" y2="12"/>
-          </svg>
-        </div>
-        <h3>环境信息</h3>
-        <div class="dim-tag">Environment & Dependencies</div>
-        <p>工具版本、API 地址、配置变更、数据库结构等环境信息。保障环境可复现。</p>
-        <div class="dim-example">[2026-07-10 16:30] 东方财富API: http://push2ex.eastmoney.com/getTopicZTPool</div>
+      <div class="card">
+        <div class="card-icon" style="background: rgba(251,191,36,0.12); color: var(--accent-amber);">⑥</div>
+        <h3>环境与依赖信息</h3>
+        <p>工具版本、API 变更、配置调整。环境一变就能对上号，不用猜"上次是什么版本"。</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ========== 工作流程展示 ========== -->
+<!-- ========== 6. 追加式演进与自我进化 ========== -->
+<section class="section" style="background: var(--bg-deep);">
+  <div class="container">
+    <h2 class="section-title"><span class="num">6</span>追加式演进与自我进化</h2>
+    <p class="section-subtitle">旧记忆不删除，新认知追加更正，Skill 自身也在迭代</p>
+
+    <h3 style="font-size:17px; margin: 28px 0 12px; color: var(--text-primary);">追加式演进：记忆的"版本控制"</h3>
+    <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.9; margin-bottom: 16px;">
+      开发认知是会迭代的——上周觉得对的参数，这周发现更好的。dev-memory 的做法是：旧记忆原封不动保留，新认知以"更正记录"的形式追加在后面。这和 Git 的版本管理思路一脉相承：你不删历史 commit，而是在上面叠新的。这样既保留了认知演进的过程（本身就有价值），又确保最新结论总是清晰的。
+    </p>
+    <div class="code-block"><span class="cmt"># 历史更正记录</span>
+<span class="dim">[2026-07-10 16:30 更正]</span> 旧记忆<span class="str">"依赖第三方Token获取数据"</span>
+  → 更正: <span class="str">"可直接用公共API获取，无需Token"</span>
+  <span class="cmt"># 旧记忆不删，更正追加在后</span></div>
+
+    <h3 style="font-size:17px; margin: 36px 0 12px; color: var(--text-primary);">自我进化：Skill 也能迭代自己</h3>
+    <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.9; margin-bottom: 16px;">
+      这一点借鉴了 Hermes Agent 的进化飞轮思路，但做得极轻。Hermes 的进化分三层：运行时技能积累、系统级 DSPy/GEPA 优化、模型级 RL 训练——强大但重，需要完整框架支撑。dev-memory 只取最外层那一点：每次执行完后回头检查，这次有没有遇到六维覆盖不了的信息？归档逻辑有没有边界情况没处理？如果有，直接在 SKILL.md 的迭代记录区域追加一条改进说明，版本号递增。
+    </p>
+    <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.9; margin-bottom: 16px;">
+      不需要训练模型，不需要优化框架，不需要额外算力。就是 AI 在每次执行后多想一步："刚才有没有什么情况我没处理好？"有的话记下来，下次改进。这和人类工程师做完一件事后的 retro（复盘）是同一个道理——简单，但有效。
+    </p>
+    <div class="code-block"><span class="cmt">## 迭代记录</span>
+
+<span class="fn">### v1.0</span> — <span class="dim">[2026-07-10 17:19]</span> 初始版本
+- 六维记忆提取 + 按周归档 + 追加式更正
+
+<span class="fn">### v1.1</span> — <span class="dim">[2026-07-12 09:30]</span> 改进说明
+- <span class="cmt">触发原因: 发现环境信息维度经常遗漏依赖版本</span>
+- <span class="cmt">改进内容: 在提取规则中增加"检查 package.json/requirements.txt 变更"</span>
+- <span class="cmt">影响范围: Step 2 环境信息提取逻辑</span></div>
+  </div>
+</section>
+
+<!-- ========== 7. 横向对比 ========== -->
 <section class="section">
   <div class="container">
-    <div class="section-header">
-      <span class="section-eyebrow">06 / Workflow</span>
-      <h2 class="section-title">工作流程</h2>
-      <p class="section-subtitle">对话结束时自动触发的 6 步执行流程，从读取到进化形成完整闭环。</p>
-    </div>
+    <h2 class="section-title"><span class="num">7</span>横向对比</h2>
+    <p class="section-subtitle">和主流记忆方案放在一起看</p>
 
-    <div class="workflow-container">
-      <div class="workflow-flow">
-        <div class="workflow-step ws-step1">
-          <div class="ws-circle">01</div>
-          <div class="ws-title">读取</div>
-          <div class="ws-desc">读取现有 DEV_MEMORY.md 和 SKILL.md 迭代记录</div>
-        </div>
-        <div class="workflow-step ws-step2">
-          <div class="ws-circle">02</div>
-          <div class="ws-title">提取</div>
-          <div class="ws-desc">从对话上下文提取六维记忆，加时间戳</div>
-        </div>
-        <div class="workflow-step ws-step3">
-          <div class="ws-circle">03</div>
-          <div class="ws-title">对比</div>
-          <div class="ws-desc">新旧记忆对比，发现矛盾/过时/错误则追加更正</div>
-        </div>
-        <div class="workflow-step ws-step4">
-          <div class="ws-circle">04</div>
-          <div class="ws-title">写入</div>
-          <div class="ws-desc">新条目插入各维度顶部，更新状态概览</div>
-        </div>
-        <div class="workflow-step ws-step5">
-          <div class="ws-circle">05</div>
-          <div class="ws-title">归档</div>
-          <div class="ws-desc">溢出条目移入按周归档文件，跨周先归档上周</div>
-        </div>
-        <div class="workflow-step ws-step6">
-          <div class="ws-circle">06</div>
-          <div class="ws-title">进化</div>
-          <div class="ws-desc">检查规则不足，自动改进 SKILL.md 并记录版本</div>
-        </div>
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>对比维度</th>
+          <th class="highlight">dev-memory</th>
+          <th>Claude Code<br><small style="font-weight:400;color:var(--text-muted);">CLAUDE.md</small></th>
+          <th>Hermes Agent<br><small style="font-weight:400;color:var(--text-muted);">四层记忆</small></th>
+          <th>ChatGPT<br><small style="font-weight:400;color:var(--text-muted);">Memory</small></th>
+          <th>Notion / 文档<br><small style="font-weight:400;color:var(--text-muted);">手动维护</small></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>记忆归属</td>
+          <td class="highlight"><strong>项目目录</strong></td>
+          <td>工具内部</td>
+          <td>Agent 框架</td>
+          <td>用户账号</td>
+          <td>第三方平台</td>
+        </tr>
+        <tr>
+          <td>工具无关</td>
+          <td class="highlight"><span class="check">✓ 任何工具可读</span></td>
+          <td><span class="cross">✗ 仅 Claude Code</span></td>
+          <td><span class="cross">✗ 仅 Hermes 框架</span></td>
+          <td><span class="cross">✗ 仅 ChatGPT</span></td>
+          <td><span class="check">✓ 但需手动</span></td>
+        </tr>
+        <tr>
+          <td>自动维护</td>
+          <td class="highlight"><span class="check">✓ AI 自动提取</span></td>
+          <td><span class="check">✓ Auto Memory</span></td>
+          <td><span class="check">✓ 运行时积累</span></td>
+          <td><span class="partial">△ 部分自动</span></td>
+          <td><span class="cross">✗ 完全手动</span></td>
+        </tr>
+        <tr>
+          <td>自我进化</td>
+          <td class="highlight"><span class="check">✓ Skill 迭代</span></td>
+          <td><span class="cross">✗ 固定逻辑</span></td>
+          <td><span class="check">✓ 三层飞轮</span></td>
+          <td><span class="cross">✗ 无</span></td>
+          <td><span class="cross">✗ 无</span></td>
+        </tr>
+        <tr>
+          <td>外部依赖</td>
+          <td class="highlight"><span class="check">✓ 零依赖</span></td>
+          <td><span class="partial">△ 需 Claude Code</span></td>
+          <td><span class="cross">✗ 需完整框架</span></td>
+          <td><span class="cross">✗ 需 OpenAI 账号</span></td>
+          <td><span class="cross">✗ 需第三方平台</span></td>
+        </tr>
+        <tr>
+          <td>版本管理</td>
+          <td class="highlight"><span class="check">✓ 跟 Git 走</span></td>
+          <td><span class="partial">△ 在项目目录但格式受限</span></td>
+          <td><span class="cross">✗ 框架内部</span></td>
+          <td><span class="cross">✗ 平台内部</span></td>
+          <td><span class="partial">△ 需额外配置</span></td>
+        </tr>
+        <tr>
+          <td>数据主权</td>
+          <td class="highlight"><span class="check">✓ 完全本地</span></td>
+          <td><span class="partial">△ 本地但工具绑定</span></td>
+          <td><span class="cross">✗ 框架管控</span></td>
+          <td><span class="cross">✗ 平台管控</span></td>
+          <td><span class="cross">✗ 平台管控</span></td>
+        </tr>
+        <tr>
+          <td>中国用户友好</td>
+          <td class="highlight"><span class="check">✓ 无限制</span></td>
+          <td><span class="cross">✗ 已知检测标记</span></td>
+          <td><span class="partial">△ 开源但重</span></td>
+          <td><span class="cross">✗ 区域限制</span></td>
+          <td><span class="check">✓ 无限制</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <strong>一句话总结：</strong>Claude Code 的 CLAUDE.md 是"工具给你的记忆"，Hermes 的四层记忆是"框架给你的进化"，dev-memory 是"你自己项目的记忆"。前者绑工具，中者绑框架，后者只绑项目——而项目是你真正拥有的。
+    </div>
+  </div>
+</section>
+
+<!-- ========== 8. 执行流程 ========== -->
+<section class="section" style="background: var(--bg-deep);">
+  <div class="container">
+    <h2 class="section-title"><span class="num">8</span>执行流程</h2>
+    <p class="section-subtitle">对话结束时自动触发，六步完成记忆提取与沉淀</p>
+
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-step-num">1</div>
+        <h4>读取</h4>
+        <p>加载现有记忆文件</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">2</div>
+        <h4>提取</h4>
+        <p>从对话中提取六维记忆</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">3</div>
+        <h4>对比</h4>
+        <p>检查矛盾与过时信息</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">4</div>
+        <h4>写入</h4>
+        <p>更新主文件与更正记录</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">5</div>
+        <h4>归档</h4>
+        <p>溢出条目按周归档</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">6</div>
+        <h4>进化</h4>
+        <p>检查 Skill 自身改进点</p>
       </div>
     </div>
 
-    <div class="code-block">
-<pre><span class="c-comment"># 文件结构</span>
-<span class="c-key">项目根目录/</span>
+    <div class="code-block"><span class="cmt"># 项目目录结构</span>
+项目根目录/
   docs/
     dev-memory/
-      <span class="c-val">DEV_MEMORY.md</span>           <span class="c-comment"># 主索引文件（最新状态 + 关键结论）</span>
+      <span class="fn">DEV_MEMORY.md</span>           <span class="cmt"># 主索引：最新状态 + 关键结论</span>
       archive/
-        <span class="c-time">2026-W28.md</span>           <span class="c-comment"># 按周归档（ISO周数）</span>
-        <span class="c-time">2026-W27.md</span>
+        <span class="dim">2026-W28.md</span>           <span class="cmt"># 按周归档：ISO 周数</span>
+        <span class="dim">2026-W27.md</span>
 
-<span class="c-comment"># 主文件每维保留上限</span>
-任务摘要 / 踩坑记录    → <span class="c-status">最多 5 条</span>
-探索路径 / 架构决策    → <span class="c-status">最多 3 条</span>
-最终结论 / 环境信息    → <span class="c-status">最多 5 条</span>
-<span class="c-comment"># 超出上限的旧条目自动溢出到当周归档文件</span></pre>
-    </div>
+<span class="cmt"># 主文件每维保留最近 5 条，超出的自动归档</span>
+<span class="cmt"># 所有时间戳精确到分钟 [YYYY-MM-DD HH:MM]</span>
+<span class="cmt"># 旧记忆永不删除，只追加更正说明</span></div>
   </div>
 </section>
 
-<!-- ========== 与其他方案对比 ========== -->
+<!-- ========== 9. 目标用户与价值 ========== -->
 <section class="section">
   <div class="container">
-    <div class="section-header">
-      <span class="section-eyebrow">07 / Comparison</span>
-      <h2 class="section-title">与其他方案对比</h2>
-      <p class="section-subtitle">dev-memory vs TRAE 内置 memory vs Notion vs Git commit — 四种方案各有取舍，dev-memory 在"随项目走 + 自动提取 + 零依赖"上优势突出。</p>
-    </div>
+    <h2 class="section-title"><span class="num">9</span>目标用户与价值</h2>
+    <p class="section-subtitle">谁需要它，为什么需要</p>
 
-    <div class="comparison-wrap">
-      <table class="comparison-table">
-        <thead>
-          <tr>
-            <th>对比维度</th>
-            <th class="highlight-col">dev-memory</th>
-            <th>TRAE 内置 memory</th>
-            <th>Notion / Confluence</th>
-            <th>Git commit message</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <div class="row-label">
-                <span class="row-icon" style="background:rgba(99,102,241,0.15);color:#818cf8;">P</span>
-                随项目走
-              </div>
-            </td>
-            <td class="highlight-col"><span class="check">&#10003;</span> 项目目录内，随 Git 管理</td>
-            <td><span class="cross">&#10007;</span> 工具级存储，换工具丢失</td>
-            <td><span class="cross">&#10007;</span> 独立平台，不随项目走</td>
-            <td><span class="check">&#10003;</span> 随 Git 走</td>
-          </tr>
-          <tr>
-            <td>
-              <div class="row-label">
-                <span class="row-icon" style="background:rgba(34,211,238,0.15);color:#22d3ee;">A</span>
-                自动提取
-              </div>
-            </td>
-            <td class="highlight-col"><span class="check">&#10003;</span> 对话结束自动触发</td>
-            <td><span class="partial">~</span> 部分自动，需用户确认</td>
-            <td><span class="cross">&#10007;</span> 需手动维护</td>
-            <td><span class="cross">&#10007;</span> 需手动写</td>
-          </tr>
-          <tr>
-            <td>
-              <div class="row-label">
-                <span class="row-icon" style="background:rgba(52,211,153,0.15);color:#34d399;">D</span>
-                零依赖
-              </div>
-            </td>
-            <td class="highlight-col"><span class="check">&#10003;</span> 纯 Markdown，零脚本</td>
-            <td><span class="cross">&#10007;</span> 依赖 TRAE 平台</td>
-            <td><span class="cross">&#10007;</span> 依赖平台账号和网络</td>
-            <td><span class="check">&#10003;</span> 零依赖</td>
-          </tr>
-          <tr>
-            <td>
-              <div class="row-label">
-                <span class="row-icon" style="background:rgba(167,139,250,0.15);color:#a78bfa;">T</span>
-                记录思考过程
-              </div>
-            </td>
-            <td class="highlight-col"><span class="check">&#10003;</span> 探索路径 + 架构决策</td>
-            <td><span class="partial">~</span> 记录结论，少记过程</td>
-            <td><span class="check">&#10003;</span> 可记录，需手动写</td>
-            <td><span class="cross">&#10007;</span> 仅记录代码变更</td>
-          </tr>
-          <tr>
-            <td>
-              <div class="row-label">
-                <span class="row-icon" style="background:rgba(251,191,36,0.15);color:#fbbf24;">C</span>
-                踩坑经验沉淀
-              </div>
-            </td>
-            <td class="highlight-col"><span class="check">&#10003;</span> 独立维度，标注解决状态</td>
-            <td><span class="partial">~</span> 散落在经验教训中</td>
-            <td><span class="check">&#10003;</span> 可记录，需手动写</td>
-            <td><span class="cross">&#10007;</span> 不记录踩坑</td>
-          </tr>
-          <tr>
-            <td>
-              <div class="row-label">
-                <span class="row-icon" style="background:rgba(251,113,133,0.15);color:#fb7185;">E</span>
-                自我进化
-              </div>
-            </td>
-            <td class="highlight-col"><span class="check">&#10003;</span> Skill 自动改进迭代</td>
-            <td><span class="cross">&#10007;</span> 规则固定</td>
-            <td><span class="cross">&#10007;</span> 模板固定</td>
-            <td><span class="cross">&#10007;</span> 无</td>
-          </tr>
-          <tr>
-            <td>
-              <div class="row-label">
-                <span class="row-icon" style="background:rgba(99,102,241,0.15);color:#818cf8;">V</span>
-                版本演进追踪
-              </div>
-            </td>
-            <td class="highlight-col"><span class="check">&#10003;</span> 追加式更正，保留轨迹</td>
-            <td><span class="cross">&#10007;</span> 覆盖式更新</td>
-            <td><span class="partial">~</span> 有版本历史</td>
-            <td><span class="check">&#10003;</span> 有 commit 历史</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="card-grid-2">
+      <div class="card">
+        <h3 style="color: var(--accent-indigo-bright);">面向谁</h3>
+        <p>所有使用 AI 编程助手（TRAE、Cursor、Copilot 等）进行项目开发的开发者。尤其是经常在多个工具和账号间切换、重视数据主权、希望项目知识可传承的人。</p>
+      </div>
+      <div class="card">
+        <h3 style="color: var(--accent-cyan);">使用场景</h3>
+        <p>项目开发全生命周期。多轮对话之间传递上下文、多人协作时传递项目历史、工具切换时保持记忆连续、项目交接时完整交付知识。</p>
+      </div>
+      <div class="card">
+        <h3 style="color: var(--accent-green);">效率价值</h3>
+        <p>消除"AI 重复探索已解决问题"的算力浪费。实测中，仅"避免重复踩坑"一项就能在复杂项目中节省 20%+ 的对话轮次。新对话开局 AI 先读记忆文件，直接跳过已验证的结论。</p>
+      </div>
+      <div class="card">
+        <h3 style="color: var(--accent-amber);">战略价值</h3>
+        <p>在 AI 工具快速迭代、平台政策不确定的环境下，为开发者提供一个稳定的、可移植的、不受外部因素影响的记忆资产层。记忆归你所有，不归任何平台。</p>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- ========== Footer ========== -->
 <footer class="footer">
-  <p class="footer-brand">dev-memory</p>
-  <p>TRAE AI 创造力大赛参赛作品 | 学习工作赛道 | 2026年7月</p>
-  <p class="footer-meta">让 AI 编程助手拥有长期记忆 · 换工具不丢知识 · 换协作者不丢上下文</p>
+  <div class="container">
+    <p>TRAE AI 创造力大赛参赛作品 · 学习工作赛道 · 2026 年 7 月</p>
+    <p style="margin-top: 8px;">dev-memory — 项目级 AI 记忆系统 · MIT License</p>
+  </div>
 </footer>
 
 </body>
