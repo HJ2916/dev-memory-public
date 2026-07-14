@@ -1,45 +1,55 @@
 # dev-memory — Claude Code 适配
 
-## 安装
+## 优先级分析
 
-### 方式一：Slash Command（推荐）
+Claude Code 的系统提示组装管线分三层：静态层（硬编码）> 动态层（Auto Memory + Skills）> 用户指令层（CLAUDE.md）。
+
+Claude Code 的 Skills 采用"渐进式披露"：启动时只加载 Skill 描述，内容按需读取。dev-memory 作为 Skill 不保证每轮触发。通过将触发规则注入到项目级 CLAUDE.md（始终加载，用户指令层），确保每轮对话自动生效。
+
+CLAUDE.md 与 Auto Memory 并列注入系统提示，由模型仲裁。CLAUDE.md 是"用户指令"权重更高，且 Auto Memory 明确不保存 CLAUDE.md 已记录的内容，无冲突。
+
+## 安装 Skill（可选）
 
 ```bash
+# 方式一：Slash Command
 mkdir -p ~/.claude/commands
 cp SKILL.md ~/.claude/commands/dev-memory.md
-```
 
-安装后在 Claude Code 中输入 `/dev-memory` 即可手动触发记忆保存。
-
-### 方式二：CLAUDE.md 引用
-
-在项目根目录的 `CLAUDE.md` 中追加：
-
-```markdown
-## 开发记忆
-
-本项目使用 dev-memory 管理开发记忆。请在对话结束时按 docs/dev-memory/SKILL.md 的流程更新记忆。
-```
-
-然后将 SKILL.md 复制到 `docs/dev-memory/SKILL.md`。
-
-### 方式三：Skills 系统（Claude Code 2.1+）
-
-Claude Code 2026 年 4 月已将 commands 合并到 skills 系统：
-
-```bash
+# 方式二：Skills 系统（Claude Code 2.1+）
 mkdir -p ~/.claude/skills/dev-memory
 cp SKILL.md ~/.claude/skills/dev-memory/SKILL.md
 ```
 
-## 触发机制
+## 注入触发规则（必须）
 
-- 方式一：手动 `/dev-memory` 触发
-- 方式二：CLAUDE.md 在每次对话加载时自动读取，AI 会按指令执行
-- 方式三：Skills 系统自动加载（如果支持自动触发）
+### 项目级注入
 
-## 特殊说明
+在项目根目录创建或编辑 `CLAUDE.md`，追加以下内容：
 
-- Claude Code 的 Auto Memory 功能与 dev-memory 不冲突，两者互补
-- Claude Code 的 CLAUDE.md 是项目级配置，dev-memory 的记忆更细粒度
-- 如同时使用 Claude Code 的 Dream 模式，dev-memory 的 Step 7.5 会与其互补
+```markdown
+## 开发记忆规则（强制）
+
+1. 对话开始时：静默读取 dev-memory/DEV_MEMORY.md 的 metadata 行和"当前状态概览"，
+   检查时效性和会话去重。如文件不存在，标记"本轮需初始化"。
+   同步检查 dev-memory/USER_PROFILE.md，如当前设备不在列表中则追加。
+2. 任务完成时（代码推送/文件创建/测试通过等）：按 dev-memory/SKILL.md 执行记忆保存流程，
+   包括六维提取、对比检查、增量写入、消息级 JSONL 追加、会话摘要更新。
+3. 话题切换时：同上。
+4. 分诊过滤：纯概念问答、单纯文件查看、闲聊未落地 → 跳过保存。
+```
+
+### 全局注入（可选）
+
+在 `~/.claude/CLAUDE.md` 中添加同样的规则，前面加一行：
+```
+注意：以下规则适用于所有项目。如项目内有 dev-memory/ 目录则自动生效，否则跳过。
+```
+
+## 与原生记忆系统的关系
+
+Claude Code 的 Auto Memory 与 dev-memory 互补不冲突：
+- Auto Memory 是 AI 自己写给自己的笔记（user/feedback/project/reference 四类），后台自动生成
+- dev-memory 是结构化的项目开发记忆（六维 + 消息级 JSONL + 会话摘要）
+- Auto Memory 明确不保存 CLAUDE.md 已记录的内容，无重复冲突
+- Auto Memory 有 Dream 整理（合并/去重/裁剪），dev-memory 有轻量 Dream（合并/去重/提升+引用频率），两者独立运作
+- CLAUDE.md 不限制字符数（假定深思熟虑），Auto Memory 有 40000 字符截断
