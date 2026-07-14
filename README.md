@@ -21,12 +21,18 @@ AI 行业发展至今，已有针对"用户"的记忆系统（ChatGPT Memory）�
 | 六维记忆提取 | 任务摘要、踩坑记录、探索路径、最终结论、架构决策、环境信息 |
 | 分诊过滤 | 不值得保存的对话直接跳过，避免无效 IO |
 | 追加式演进 | 旧记忆永不删除，只追加更正说明，完整保留知识演进轨迹 |
-| 轻量 Dream 整理 | 合并/去重/提升 + 引用频率追踪，内联执行不需要 daemon |
+| 轻量 Dream 整理 | 合并/去重/提升 + 引用频率追踪，异步执行（v2.1）+ 冷却期控制（v2.1.1） |
 | 用户画像+溯源 | 贡献者日志 + 设备历史，跨设备完整继承记忆 |
-| 多工具适配 | 支持 10 个主流 AI 编程工具，寄生式注入 |
+| 多工具适配 | 支持 9+ 个主流 AI 编程工具，寄生式注入 |
 | 隐私感知 | 记忆文件默认 gitignore，公开仓库忽略/私有仓库建议追踪 |
 | 零依赖 | 纯 Markdown + JSONL，不执行任何脚本，换任何工具都能读 |
 | 自我进化 | Skill 自身预留迭代记录区域，含触发可靠性审计 |
+| **时序感知**（v2.1） | `[有效期:]` 标记 + `[~⏰]` 过期检测 + Dream 过期处理，纯文件实现时序推理 |
+| **条件触发**（v2.2） | CONFIG.md 路径-记忆映射表（YAML），按操作路径加载匹配记忆 |
+| **模块化文件**（v2.2） | `@dimensions/XX-name.md` 引用语法，单文件膨胀时自动拆分 |
+| **显式遗忘**（v2.2） | "忘记 [关键词]" → `[~💀]` 标记 → Dream 归档到 `archived.jsonl` |
+| **记忆健康仪表盘**（v2.1） | `health-report.md` 可视化记忆状态：总览/引用Top5/过期/Dream历史/维度健康 |
+| **异步 Dream**（v2.1） | 任务完成后反馈前异步执行，结果写入 `dream.md` 供下次加载 |
 
 ## 支持的 AI 工具
 
@@ -34,7 +40,7 @@ AI 行业发展至今，已有针对"用户"的记忆系统（ChatGPT Memory）�
 |------|---------|---------|
 | **TRAE** | 项目 Rules (project_rules) | [adapters/TRAE.md](adapters/TRAE.md) |
 | **Claude Code** | `CLAUDE.md` | [adapters/claude-code.md](adapters/claude-code.md) |
-| **Codex / OpenCode / MiMoCode** | `AGENTS.md` | [adapters/AGENTS.md](adapters/AGENTS.md) |
+| **Codex / OpenCode / MiMoCode / Qwen Code** | `AGENTS.md`（v2.2 跨工具统一入口） | [adapters/AGENTS.md](adapters/AGENTS.md) |
 | **Cursor** | `.cursor/rules/dev-memory.mdc` | [adapters/cursor.md](adapters/cursor.md) |
 | **GitHub Copilot** | `.github/copilot-instructions.md` | [adapters/copilot.md](adapters/copilot.md) |
 | **Windsurf** | `.windsurf/rules/dev-memory.md` | [adapters/windsurf.md](adapters/windsurf.md) |
@@ -61,9 +67,13 @@ AI 行业发展至今，已有针对"用户"的记忆系统（ChatGPT Memory）�
     SKILL.md               ← 完整执行规范（纳入 Git，有下载地址则不需要）
     DEV_MEMORY.md          ← 主记忆文件（默认 gitignore）
     USER_PROFILE.md        ← 用户画像+贡献者日志+设备历史（默认 gitignore）
+    health-report.md       ← 记忆健康仪表盘（默认 gitignore）
     sessions/              ← 会话级+消息级记录（默认 gitignore）
       2026-07-14.md        ← 当日会话摘要
       2026-07-14.jsonl     ← 当日消息级记录
+      2026-07-14.dream.md  ← Dream 整理结果（v2.1）
+      archived.jsonl       ← 已遗忘条目归档（v2.2）
+    dimensions/            ← 模块化记忆拆分文件（v2.2，默认 gitignore）
 ```
 
 ## 隐私策略
@@ -93,12 +103,15 @@ dev-memory 站在两个成熟方案肩上，取其精华，去其重量：
 
 ## 技术规格
 
-- **版本**：v2.0
+- **版本**：v2.2
 - **架构**：三层混合分层 + 寄生式注入
-- **触发方式**：双触发（开头检查 + 结尾硬触发）+ 寄生式注入（Rule 级优先级）
+- **核心原则**：16 条（含时序感知、条件触发、模块化文件、显式遗忘）
+- **触发方式**：双触发（开头检查 + 结尾硬触发）+ 寄生式注入（Rule 级优先级）+ 条件触发（路径映射）
 - **执行流程**：7.5 步（多项目识别 → 分诊 → 读取 → 提取 → 对比 → 写入+JSONL+摘要 → 进化 → Dream → 反馈）
-- **输出格式**：Markdown（项目级/会话级）+ JSONL（消息级，必选）
-- **归档策略**：已取消，sessions/ 完整保留所有消息级记录
+- **开头检查**：9 步（含时效扫描、Dream 摘要加载、条件触发路径匹配）
+- **Dream 操作**：7 个（合并/去重/提升/引用频率/交叉引用/过期处理/遗忘归档）
+- **输出格式**：Markdown（项目级/会话级）+ JSONL（消息级，10 字段，必选）
+- **归档策略**：sessions/ 完整保留消息级记录；显式遗忘条目归档到 archived.jsonl
 - **时间精度**：精确到分钟（`YYYY-MM-DD HH:MM`）
 - **兼容性**：任何能读取 Markdown 的工具/平台
 
