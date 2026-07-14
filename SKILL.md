@@ -25,7 +25,7 @@
 15. **模块化文件（v2.2 新增）**：当 DEV_MEMORY.md 某维度条目超过上限时，自动拆分为 `dev-memory/dimensions/XX-name.md` 独立文件，DEV_MEMORY.md 通过 `@dimensions/XX-name.md` 引用。借鉴 Claude Code `@path/to/file` 导入语法，预防文件膨胀导致的截断问题
 16. **显式遗忘（v2.2 新增）**：用户可通过指令"忘记 [关键词]"标记条目为 `[~💀]`（已遗忘），Dream 整理时将 `[~💀]` 条目移入 `sessions/archived.jsonl`（不删除，但不再加载）。借鉴 Cognee `forget` 操作，比纯追加式更灵活
 17. **自动关联检测（v3.0 新增）**：Step 4 对比检查时，不仅检查矛盾和过时，还主动检测新条目与已有条目的关键词重合度（≥2 个关键名词匹配），自动递增被关联条目的引用计数并追加 `[关联: XX条目摘要]` 交叉引用标记。解决引用频率偏低问题，使知识网络自然形成
-18. **版本迁移（v3.0 新增）**：对使用旧版格式（v1.x `docs/dev-memory/` 路径或无指纹/引用计数/有效期标记）的项目，AI 在开头检查时检测到旧格式后，主动提示用户升级并执行迁移：路径迁移(`docs/dev-memory/`→`dev-memory/`)、格式迁移(添加指纹行+`[引用:0]`+价值标记+`[有效期:]`)、补建文件(CONFIG.md+sessions/+USER_PROFILE.md)。迁移不删除旧记忆，只追加格式标记
+18. **版本迁移（v3.0 新增）**：对使用旧版格式（v1.x `docs/dev-memory/` 路径或无指纹/引用计数/有效期标记）的项目，AI 在开头检查时检测到旧格式后，主动提示用户升级并执行迁移：路径迁移(`docs/dev-memory/`→`dev-memory/`)、格式迁移(添加指纹行+`[引用:0]`+价值标记+`[有效期:]`)、补建文件(CONFIG.md+sessions/+USER_PROFILE.md)、**触发规则验证**（确认宿主AI记忆系统已包含当前项目的项目专属触发规则，路径指向正确）。迁移不删除旧记忆，只追加格式标记
 
 ## v1.x → v3.0 迁移指南
 
@@ -42,13 +42,17 @@
    - 复制 CONFIG.md 和 SKILL.md（从 dev-memory 项目获取）
    - 创建 `sessions/` 目录
    - 创建 USER_PROFILE.md（贡献者日志+设备历史）
-4. **触发规则注入**：按当前使用的 AI 工具，参考 adapters/ 注入触发规则
+4. **触发规则注入与验证（关键步骤）**：按当前使用的 AI 工具，参考 adapters/ 注入触发规则。**必须验证**：宿主 AI 的记忆系统（如 TRAE project_memory.md / Claude Code CLAUDE.md / Cursor .cursor/rules）中是否包含当前项目的触发规则，且规则中的 `dev-memory/` 路径明确指向当前项目根目录下的 dev-memory/（而非 workspace 根目录）。如未包含，需手动添加项目专属触发规则。**未通过验证的迁移视为未完成**——github-trending 项目曾因跳过此步骤导致后续 5 个 bug 修复未被记忆系统捕获
 5. **首次 Dream**：迁移后执行一次 Dream 整理，生成交叉引用和有效期标记
 
 ### 迁移原则
 - 旧记忆不删除，只追加格式标记
 - 旧路径保留兼容（可选符号链接）
 - 迁移后自动进入 v3.0 正常流程
+
+### 迁移陷阱（实战教训）
+- **触发规则未验证**：github-trending 项目迁移后跳过触发规则验证步骤，导致宿主AI（TRAE）的 project_memory.md 中仍使用 workspace 根目录的 dev-memory 路径，后续会话中的 5 个 bug 修复未被记忆系统捕获。**根因**：迁移指南原步骤4仅写"参考adapters/注入触发规则"，未要求验证宿主AI记忆系统是否已包含当前项目的项目专属触发规则
+- **多项目路径混淆**：TRAE project_memory.md 中的触发规则使用相对路径 "dev-memory/DEV_MEMORY.md"，未明确指出是"当前操作项目"的 dev-memory。当 workspace 下有多个项目时，AI 可能误读 workspace 根目录而非项目目录
 
 ## 双触发机制
 
