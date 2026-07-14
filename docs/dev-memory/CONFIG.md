@@ -1,60 +1,62 @@
-# dev-memory 项目记忆配置
+# dev-memory 配置
 
-> 本项目使用 [dev-memory](https://github.com/HJ2916/dev-memory) 管理开发记忆。
-> 记忆归项目所有，不绑任何平台，随 Git 版本管理。
+## 版本
+- dev-memory 版本: v2.0
+- 执行规范: dev-memory/SKILL.md
+- 安装地址: https://github.com/HJ2916/dev-memory-public
 
-## 安装 Skill
+## 多工具注入指引
 
-dev-memory 是一个纯 Markdown 指令文件，无脚本无依赖。根据你使用的 AI 工具选择安装方式：
+dev-memory v2.0 采用"寄生式注入"策略，将触发规则注入到各工具的最高优先级配置文件中，确保每轮对话自动触发。
 
-| 工具 | 安装方式 |
-|------|---------|
-| **TRAE** | 复制 SKILL.md 到 `~/.trae-cn/skills/dev-memory/SKILL.md` |
-| **Claude Code** | 复制到 `~/.claude/commands/dev-memory.md`，或在项目 CLAUDE.md 中引用 |
-| **Codex CLI** | 在项目 `AGENTS.md` 中追加引用 |
-| **Cursor** | 复制到 `.cursor/rules/dev-memory.mdc`（需添加 MDC 元数据头） |
-| **GitHub Copilot** | 在 `.github/copilot-instructions.md` 中追加引用 |
-| **Windsurf** | 在 `.windsurfrules` 中追加引用 |
-| **Cline** | 在 `.clinerules` 中追加引用，或复制到 `.clinerules/dev-memory.md` |
-| **CodeBuddy** | 复制到 `.codebuddy/rules/dev-memory.md` |
-| **OpenCode / MiMoCode** | 在项目 `AGENTS.md` 中追加引用（同 Codex） |
-| **其他工具** | 将 SKILL.md 内容粘贴到工具的自定义指令配置中 |
+| 工具 | 注入文件 | 注入类型 | 适配说明 |
+|------|---------|---------|---------|
+| **TRAE** | 项目 Rules (project_rules) | 硬性准则 | adapters/TRAE.md |
+| **Claude Code** | `CLAUDE.md` | 用户指令 | adapters/claude-code.md |
+| **Codex / OpenCode / MiMoCode** | `AGENTS.md` | 确定性加载 | adapters/AGENTS.md |
+| **Cursor** | `.cursor/rules/dev-memory.mdc` | alwaysApply | adapters/cursor.md |
+| **GitHub Copilot** | `.github/copilot-instructions.md` | 仓库级 | adapters/copilot.md |
+| **Windsurf** | `.windsurf/rules/dev-memory.md` | always_on | adapters/windsurf.md |
+| **Cline** | `.clinerules` | 始终加载 | adapters/cline.md |
+| **CodeBuddy** | `.codebuddy/rules/dev-memory.md` | 始终加载 | adapters/codebuddy.md |
+| **通用** | 自定义指令 | 始终加载 | adapters/generic.md |
 
-下载地址：https://github.com/HJ2916/dev-memory
-
-详细适配说明见 `adapters/` 目录。
+详细注入步骤和规则内容见各适配器文件。
 
 ## 隐私设置
 
-本项目的记忆文件（DEV_MEMORY.md 和 archive/）默认 **不纳入 Git**，保护开发隐私。
-
-| 仓库类型 | 推荐设置 | 原因 |
-|---------|---------|------|
-| 公开仓库 | 记忆文件 gitignore（默认） | 保护开发隐私，避免泄露内部决策和踩坑细节 |
-| 私有仓库 | 记忆文件纳入 Git | 便于多设备同步、团队协作、项目交接 |
-| 个人本地 | 任意 | 无远程仓库，不涉及隐私问题 |
-
-**修改方式**：编辑项目根目录的 `.gitignore`，注释/取消注释以下行：
-
-```gitignore
-# dev-memory 记忆文件
-# 如需追踪记忆（如私有仓库），注释掉以下两行
-docs/dev-memory/DEV_MEMORY.md
-docs/dev-memory/archive/
-```
+| 仓库类型 | 推荐设置 | 修改方式 |
+|---------|---------|---------|
+| 公开仓库 | 记忆文件 gitignore（默认） | 保持 .gitignore 不变 |
+| 私有仓库 | 记忆文件纳入 Git | 注释掉 .gitignore 中 dev-memory 相关行 |
+| 个人本地 | 任意 | 无远程仓库 |
 
 ## 记忆文件说明
 
 | 文件 | 说明 | 是否纳入 Git |
 |------|------|-------------|
-| `CONFIG.md` | 本文件，配置和引导 | 始终纳入 |
-| `DEV_MEMORY.md` | 主记忆文件 | 默认不纳入 |
-| `archive/*.md` | 按周归档 | 默认不纳入 |
-| `SKILL.md` | 维护指令（如项目内放置） | 始终纳入 |
+| `CONFIG.md` | 本文件，配置和注入指引 | 始终纳入 |
+| `SKILL.md` | 完整执行规范 | 始终纳入 |
+| `DEV_MEMORY.md` | 项目级六维记忆索引 | 默认不纳入 |
+| `USER_PROFILE.md` | 用户画像+贡献者日志+设备历史 | 默认不纳入 |
+| `sessions/*.md` | 会话级摘要 | 默认不纳入 |
+| `sessions/*.jsonl` | 消息级记录 | 默认不纳入 |
+
+## Git Hook（可选，提高触发可靠性）
+
+将以下内容保存为 `.git/hooks/post-commit`：
+
+```bash
+#!/bin/bash
+echo "⚠️ dev-memory: 本次 commit 的变更已记录到 Git。"
+echo "请确认 AI 已执行记忆保存流程（dev-memory/DEV_MEMORY.md + sessions/ JSONL）。"
+echo "如未执行，请提醒 AI: '请按 dev-memory/SKILL.md 保存记忆'"
+```
 
 ## 快速开始
 
-1. 安装 Skill（见上方"安装 Skill"章节）
-2. 开始正常开发，AI 会在对话结束时自动提取和保存记忆
-3. 查看记忆：打开 `docs/dev-memory/DEV_MEMORY.md`
-4. 如需手动触发：告诉 AI "保存记忆"或"更新项目记忆"
+1. 选择你的 AI 工具，按上方注入指引配置触发规则
+2. 安装 Skill（可选，有下载地址则不需要）：`cp SKILL.md dev-memory/SKILL.md`
+3. 开始正常开发，AI 会在对话开始时静默检查、任务完成时自动保存记忆
+4. 查看记忆：打开 `dev-memory/DEV_MEMORY.md`
+5. 如需手动触发：告诉 AI "保存记忆"或"更新项目记忆"

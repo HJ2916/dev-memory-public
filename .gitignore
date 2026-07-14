@@ -20,9 +20,11 @@ desktop.ini
 
 # === dev-memory 隐私策略 ===
 # 默认不追踪记忆文件，保护开发隐私
-# 如需追踪（如私有仓库便于多设备同步），注释掉以下两行
-docs/dev-memory/DEV_MEMORY.md
-docs/dev-memory/archive/
+# 如需追踪（如私有仓库便于多设备同步），注释掉以下行
+dev-memory/DEV_MEMORY.md
+dev-memory/USER_PROFILE.md
+dev-memory/sessions/
 
 # 始终追踪的文件（配置和引导，不含记忆数据）
-!docs/dev-memory/CONFIG.md
+!dev-memory/CONFIG.md
+!dev-memory/SKILL.md
