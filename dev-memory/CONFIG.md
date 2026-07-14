@@ -1,7 +1,7 @@
 # dev-memory 配置
 
 ## 版本
-- dev-memory 版本: v2.2
+- dev-memory 版本: v3.0
 - 执行规范: dev-memory/SKILL.md
 - 安装地址: https://github.com/HJ2916/dev-memory-public
 
