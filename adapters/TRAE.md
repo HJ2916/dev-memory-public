@@ -27,11 +27,14 @@ cp SKILL.md ~/.trae/skills/dev-memory/SKILL.md
 ```markdown
 ## 开发记忆规则（强制）
 
-1. 对话开始时：静默读取 dev-memory/DEV_MEMORY.md 的 metadata 行和"当前状态概览"，
+1. 对话开始时：在生成任何回复之前，必须先静默读取 dev-memory/DEV_MEMORY.md 的 metadata 行和"当前状态概览"，
    检查时效性和会话去重。如文件不存在，标记"本轮需初始化"。
    同步检查 dev-memory/USER_PROFILE.md，如当前设备不在列表中则追加。
+   扫描 [有效期:] 标记，过期条目标记 [~⏰]。
+   读取最近一次 sessions/YYYY-MM-DD.dream.md 摘要（如存在）。
 2. 任务完成时（代码推送/文件创建/测试通过等）：按 dev-memory/SKILL.md 执行记忆保存流程，
-   包括六维提取、对比检查、增量写入、消息级 JSONL 追加、会话摘要更新。
+   包括六维提取、对比检查、增量写入、即时追加消息级 JSONL、会话摘要更新。
+   JSONL 必须在每次任务完成时立即追加，不得批量补录。
 3. 话题切换时：同上。
 4. 分诊过滤：纯概念问答、单纯文件查看、闲聊未落地 → 跳过保存。
 ```
