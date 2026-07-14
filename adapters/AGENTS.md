@@ -1,6 +1,6 @@
-# dev-memory — AGENTS.md 跨工具统一适配（v2.2）
+# dev-memory — AGENTS.md 跨工具统一适配（v3.0 兼容）
 
-## 跨工具标准地位（v2.2 新增）
+## 跨工具标准地位（v2.2 新增，v3.0 兼容）
 
 AGENTS.md 已成为跨工具通用标准，被以下工具原生支持：
 - **Codex CLI** / **OpenCode** / **MiMoCode**：主要指令文件
