@@ -1,7 +1,7 @@
 # dev-memory 配置
 
 ## 版本
-- dev-memory 版本: v2.0
+- dev-memory 版本: v2.2
 - 执行规范: dev-memory/SKILL.md
 - 安装地址: https://github.com/HJ2916/dev-memory-public
 
@@ -39,8 +39,38 @@ dev-memory v2.0 采用"寄生式注入"策略，将触发规则注入到各工�
 | `SKILL.md` | 完整执行规范 | 始终纳入 |
 | `DEV_MEMORY.md` | 项目级六维记忆索引 | 默认不纳入 |
 | `USER_PROFILE.md` | 用户画像+贡献者日志+设备历史 | 默认不纳入 |
+| `health-report.md` | 记忆健康仪表盘（v2.1） | 默认不纳入 |
+| `dimensions/*.md` | 模块化记忆拆分文件（v2.2） | 默认不纳入 |
 | `sessions/*.md` | 会话级摘要 | 默认不纳入 |
 | `sessions/*.jsonl` | 消息级记录 | 默认不纳入 |
+| `sessions/*.dream.md` | Dream 整理结果（v2.1） | 默认不纳入 |
+| `sessions/archived.jsonl` | 已遗忘条目归档（v2.2） | 默认不纳入 |
+
+## 路径-记忆映射表（v2.2 新增，可选）
+
+在此配置文件路径模式与记忆维度的映射，开头检查时按当前操作路径额外加载匹配记忆。
+留空则不启用条件触发，仅使用基础开头检查。
+
+```yaml
+# 示例配置（取消注释并按需修改）
+# path_mappings:
+#   - path: "src/api/**"
+#     dimensions: ["⑤架构决策", "②踩坑记录"]
+#     keywords: ["API", "接口", "端点"]
+#   - path: "*.test.*"
+#     dimensions: ["②踩坑记录"]
+#     keywords: ["测试", "test", "mock"]
+#   - path: "config/**"
+#     dimensions: ["⑥环境信息", "⑤架构决策"]
+#     keywords: ["配置", "config", "环境变量"]
+```
+
+## 显式遗忘指令（v2.2 新增）
+
+用户可通过以下指令标记记忆为遗忘：
+- "忘记 [关键词]" — 搜索匹配条目，标记 `[~💀]`
+- "忘掉 [关键词]" — 同上
+- 标记后的条目在下次 Dream 整理时移入 `sessions/archived.jsonl`（不删除，但不再加载）
 
 ## Git Hook（可选，提高触发可靠性）
 

@@ -23,6 +23,8 @@ desktop.ini
 # 如需追踪（如私有仓库便于多设备同步），注释掉以下行
 dev-memory/DEV_MEMORY.md
 dev-memory/USER_PROFILE.md
+dev-memory/health-report.md
+dev-memory/dimensions/
 dev-memory/sessions/
 
 # 始终追踪的文件（配置和引导，不含记忆数据）
