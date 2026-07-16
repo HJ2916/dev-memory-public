@@ -6,12 +6,18 @@ CodeBuddy（腾讯）支持多层级的规则系统：Project Rules（.codebuddy
 
 Project Rules 受版本控制管理，可与团队成员共享。CodeBuddy Code 2.0 支持 Skills 系统。
 
-## 安装 Skill（可选）
+## 安装 Skill（推荐）
 
 ```bash
 mkdir -p .codebuddy/rules
 cp SKILL.md .codebuddy/rules/dev-memory-skill.md
 ```
+
+### 安装验证
+
+1. 重启 CodeBuddy
+2. 检查 `.codebuddy/rules/dev-memory.md` 是否在规则列表中显示
+3. 在对话中输入 "保存记忆"，检查 AI 是否执行保存流程
 
 ## 注入触发规则（必须）
 

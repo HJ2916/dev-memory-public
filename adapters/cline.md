@@ -6,7 +6,7 @@ Cline 的配置系统简单：系统提示 > .clinerules（始终加载，全部
 
 Cline 没有原生持久化记忆系统（社区有 Memory Bank 概念但非内置），.clinerules 始终加载，无冲突。
 
-## 安装 Skill（可选）
+## 安装 Skill（推荐）
 
 ```bash
 # 方式一：单文件
@@ -16,6 +16,12 @@ cp SKILL.md .clinerules/dev-memory-skill.md
 mkdir -p .clinerules
 cp SKILL.md .clinerules/dev-memory.md
 ```
+
+### 安装验证
+
+1. 重启 Cline
+2. 检查 `.clinerules` 文件是否被加载（Cline 启动日志中会显示加载的规则文件）
+3. 在对话中输入 "保存记忆"，检查 AI 是否执行保存流程
 
 ## 注入触发规则（必须）
 

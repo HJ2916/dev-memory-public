@@ -10,6 +10,8 @@ CLAUDE.md 与 Auto Memory 并列注入系统提示，由模型仲裁。CLAUDE.md
 
 ## 安装 Skill（可选）
 
+> **重要**：SKILL.md 文件顶部必须包含 YAML front matter 元数据块（`---name/description---`），否则 Claude Code Skills 系统无法识别。
+
 ```bash
 # 方式一：Slash Command
 mkdir -p ~/.claude/commands
@@ -19,6 +21,12 @@ cp SKILL.md ~/.claude/commands/dev-memory.md
 mkdir -p ~/.claude/skills/dev-memory
 cp SKILL.md ~/.claude/skills/dev-memory/SKILL.md
 ```
+
+### 安装验证
+
+1. 重启 Claude Code
+2. 输入 `/dev-memory` 检查是否可用（Slash Command 模式）
+3. 或在对话中输入 "使用 dev-memory skill"，检查 AI 是否能加载 Skill 内容
 
 ## 注入触发规则（必须）
 

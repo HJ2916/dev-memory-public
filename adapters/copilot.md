@@ -6,12 +6,18 @@ Copilot 的配置优先级：组织级 > 仓库级（.github/copilot-instruction
 
 Copilot 没有原生持久化记忆系统，配置文件始终加载，无冲突。
 
-## 安装 Skill（可选）
+## 安装 Skill（推荐）
 
 将 SKILL.md 复制到项目内：
 ```bash
 cp SKILL.md dev-memory/SKILL.md
 ```
+
+### 安装验证
+
+1. 重启 GitHub Copilot 扩展
+2. 确认 `.github/copilot-instructions.md` 中包含 dev-memory 触发规则
+3. 在对话中输入 "保存记忆"，检查 AI 是否能读取 SKILL.md 执行保存流程
 
 ## 注入触发规则（必须）
 

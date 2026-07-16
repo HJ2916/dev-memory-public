@@ -2,6 +2,30 @@
 
 所有重要变更记录在此文件中。格式基于 [Keep a Changelog](https://keepachangelog.com/)。
 
+## [3.1.1] - 2026-07-16
+
+### Fixed
+- **关键修复**：SKILL.md 顶部添加 YAML front matter（`---name/description---`），修复 TRAE 等工具无法识别和注册 Skill 的问题
+- 所有 9 个适配器（adapters/）统一更新："安装 Skill（可选）"改为"安装 Skill（推荐）"，添加 YAML front matter 警告和安装验证步骤
+- README.md "快速开始"新增 Step 1 "安装 Skill"步骤，明确两步安装流程（Skill 安装 + 触发规则注入）
+
+### Added
+- 每个适配器新增"安装验证"章节，列出 3 步验证方法
+- README.md 新增"为什么需要两步？"说明（Skill 提供执行规范，触发规则确保自动触发）
+
+## [3.1.0] - 2026-07-15
+
+### Added
+- 记忆缺口检测（开头检查 Step 10）：JSONL 时间戳 vs 代码文件 mtime，自动发现跨会话遗漏并补录
+- Step 5.5 合规自检：6 项文件逐项检查（DEV_MEMORY/JSONL/摘要/PROFILE/metadata/索引），杜绝"部分执行"
+- 跨会话隔离限制说明
+- 迁移后新对话建议
+
+### Changed
+- 核心原则 17→19 条
+- 开头检查 8→10 步
+- 执行流程 7→7.5 步
+
 ## [3.0.0] - 2026-07-14
 
 ### Added

@@ -6,7 +6,9 @@ TRAE 的优先级链：系统提示 > Rules（硬性准则）> Memory（柔性�
 
 dev-memory 作为 Skill 时处于最低优先级，不保证每轮触发。通过将触发规则注入到项目 Rules（project_rules），提升到最高优先级（硬性准则，必须遵守）。
 
-## 安装 Skill（可选）
+## 安装 Skill（推荐）
+
+> **重要**：SKILL.md 文件顶部必须包含 YAML front matter 元数据块（`---name/description---`），否则 TRAE 无法识别和注册该 Skill。
 
 ```bash
 # TRAE 中国版
@@ -17,6 +19,13 @@ cp SKILL.md ~/.trae-cn/skills/dev-memory/SKILL.md
 mkdir -p ~/.trae/skills/dev-memory
 cp SKILL.md ~/.trae/skills/dev-memory/SKILL.md
 ```
+
+### 安装验证
+
+1. **重启 TRAE**（或开启新对话）
+2. 在对话框中输入 `/`，检查下拉列表中是否出现 `dev-memory`
+3. 如未出现，检查 SKILL.md 文件开头是否为 `---`（YAML front matter）
+4. 确认 `skill-config.json` 中 `disabledSkills` 数组不包含 `dev-memory`
 
 ## 注入触发规则（必须）
 

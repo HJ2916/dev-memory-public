@@ -13,12 +13,20 @@ dev-memory 触发规则使用 `always_on` 模式，确保每轮对话自动生�
 
 注意：Windsurf 有 12,000 字符的上下文限制，过多 `always_on` 规则会过早耗尽配额。dev-memory 的规则仅 8 行，影响可忽略。
 
-## 安装 Skill（可选）
+## 安装 Skill（推荐）
+
+> **重要**：SKILL.md 文件顶部包含 YAML front matter（`---name/description---`）。Windsurf 的规则文件使用自己的 front matter 格式（`trigger: always_on`）。
 
 ```bash
 mkdir -p .windsurf/rules
 cp SKILL.md .windsurf/rules/dev-memory-skill.md
 ```
+
+### 安装验证
+
+1. 重启 Windsurf
+2. 检查 `.windsurf/rules/dev-memory.md` 是否在 Rules 面板中显示且状态为 `always_on`
+3. 在对话中输入 "保存记忆"，检查 AI 是否执行保存流程
 
 ## 注入触发规则（必须）
 

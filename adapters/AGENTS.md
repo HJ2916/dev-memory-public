@@ -26,12 +26,18 @@ dev-memory 的触发规则注入到 AGENTS.md 后，确保每次运行都生效�
 | OpenCode | `./AGENTS.md` | `~/.opencode/AGENTS.md` |
 | MiMoCode | `./AGENTS.md` | `~/.mimo/AGENTS.md` |
 
-## 安装 Skill（可选）
+## 安装 Skill（推荐）
 
 将 SKILL.md 复制到项目内：
 ```bash
 cp SKILL.md dev-memory/SKILL.md
 ```
+
+### 安装验证
+
+1. 重启工具（Codex/OpenCode/MiMoCode 等）
+2. 确认 `AGENTS.md` 中包含 dev-memory 触发规则
+3. 在对话中输入 "保存记忆"，检查 AI 是否执行保存流程
 
 ## 注入触发规则（必须）
 

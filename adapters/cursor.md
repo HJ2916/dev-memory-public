@@ -8,12 +8,20 @@ Cursor 没有原生持久化记忆系统（LLM 不跨会话记忆），不存在
 
 `.cursor/rules/*.mdc` 设置 `alwaysApply: true` 后，规则内容在每次会话开始时自动注入到上下文开头。Cursor 2026 年也原生支持 AGENTS.md 作为简化替代。
 
-## 安装 Skill（可选）
+## 安装 Skill（推荐）
+
+> **重要**：SKILL.md 文件顶部包含 YAML front matter（`---name/description---`）。Cursor 的 `.mdc` 规则文件使用自己的 front matter 格式，复制时需保留两者。
 
 ```bash
 mkdir -p .cursor/rules
 cp SKILL.md .cursor/rules/dev-memory-skill.mdc
 ```
+
+### 安装验证
+
+1. 重启 Cursor
+2. 检查 `.cursor/rules/dev-memory.mdc` 是否在规则列表中显示（Settings > Rules）
+3. 确认 `alwaysApply: true` 已设置
 
 ## 注入触发规则（必须）
 
